@@ -20,7 +20,7 @@ tags:
 
 安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress)
+![img](./assets/img/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress)
 
 Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址
 
@@ -36,7 +36,7 @@ Update没什么好说的，就是同步服务器上的最新代码到本地。�
 
 Commit，提交本地的文件到服务器上。
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png?x-oss-process=style/mxcompress)
+![img](./assets/img/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png?x-oss-process=style/mxcompress)
 
 上方文本框内填写备注，备注本次提交的内容（一般都要求写）
 

@@ -50,7 +50,7 @@ bootstrap原意是靴子，但是这跟计算机有什么关系呢？
 
 经常装系统的同学可能很熟悉这个操作：插上U盘，按下开机键（短接电源），猛按f8或者某个按键，在屏幕弹出来的窗口上选择U盘，然后就进入PE或者是系统安装程序进行系统的安装。
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress)
+![img](./assets/img/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress)
 
 BIOS启动后，需要运行下一个程序，也就是要找到下一个启动程序所在的存储设备（例如硬盘或者U盘）。
 
@@ -58,7 +58,7 @@ BIOS根据用户选择的启动设备或者是默认的启动顺序，判断该�
 
 现在知道设备可用于启动了，那么现在就需要知道该到哪去运行下一个程序。而MBR中存储的就是操作系统在该设备上的位置，下一步就显而易见了，找到操作系统，启动！
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/b864d20e64f6e15e211f6017b3af5981-d3c0bd-1610095362.png?x-oss-process=style/mxcompress)
+![img](./assets/img/b864d20e64f6e15e211f6017b3af5981-d3c0bd-1610095362.png?x-oss-process=style/mxcompress)
 
 文章篇幅看似挺长，对于今天的计算机来讲，不过是“弹指一瞬间”，按下开机按钮，不出一会屏幕上就显示出操作系统的启动动画，或者对于土豪玩家，说不定已经能看到桌面了（汗。
 

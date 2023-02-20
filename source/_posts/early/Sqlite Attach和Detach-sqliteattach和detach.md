@@ -22,7 +22,7 @@ Detach 分离数据库，跟Attach相反，即分离附加的数据库。
 
 Main数据库中有一个user表如下：
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/70b3338d971672a212404a0d8a3e1aae-63131e-1610094720.png?x-oss-process=style/mxcompress)
+![img](./assets/img/70b3338d971672a212404a0d8a3e1aae-63131e-1610094720.png?x-oss-process=style/mxcompress)
 
 Main_Bak数据库为空，没有任何表和数据。
 
@@ -40,7 +40,7 @@ attach database 'Main.db' as MainDB; # 路径应为绝对路径，此处略去�
 select * from MainDB.user; # 在Main_Bak数据库中查询Main数据库的信息
 ```
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/2c09e4b145e3277cd3158227524bda29-18f894-1610094731.png?x-oss-process=style/mxcompress)
+![img](./assets/img/2c09e4b145e3277cd3158227524bda29-18f894-1610094731.png?x-oss-process=style/mxcompress)
 
 结果正确
 
@@ -48,7 +48,7 @@ select * from MainDB.user; # 在Main_Bak数据库中查询Main数据库的信息
 create table user_bak as select * from MainDB.user; # 以Main数据库中user表的结构和数据在Main_bak数据库中建表
 ```
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/484fbfae2091eca9b1211cead74bf72e-e3a9f9-1610094740.png?x-oss-process=style/mxcompress)
+![img](./assets/img/484fbfae2091eca9b1211cead74bf72e-e3a9f9-1610094740.png?x-oss-process=style/mxcompress)
 
 操作成功，同时操作了两个数据库文件。
 
@@ -58,7 +58,7 @@ detach database MainDB;
 
 若此时再次执行上文中的查询语句便会报错
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/f208d5e5ce8e1fcec42f85b52ed231be-98f0dd-1610094747.png?x-oss-process=style/mxcompress)
+![img](./assets/img/f208d5e5ce8e1fcec42f85b52ed231be-98f0dd-1610094747.png?x-oss-process=style/mxcompress)
 
 参考资料:
 

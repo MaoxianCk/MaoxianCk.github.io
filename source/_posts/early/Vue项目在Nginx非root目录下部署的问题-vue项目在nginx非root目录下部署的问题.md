@@ -16,7 +16,7 @@ tags:
 
 最近在部署Vue项目时，出现如下错误：
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress)
+![img](./assets/img/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress)
 
 一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。
 
@@ -45,7 +45,7 @@ module.exports = {
 
 重新build项目，检查打包后的dist文件夹中的index.html文件的资源引用路径是否正确（publicPath打头的路径）
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png?x-oss-process=style/mxcompress)
+![img](./assets/img/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png?x-oss-process=style/mxcompress)
 
 修改nginx配置文件，nginx.conf
 

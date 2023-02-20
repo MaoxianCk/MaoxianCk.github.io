@@ -14,7 +14,7 @@ tags:
 
 上一篇文章中，我们已经搭建好了springboot web项目的基本架构，但是web开发当然只有这些是不够的，而一个项目当然也需要一个比较好的结构划分，
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress)
+![img](./assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress)
 
 - main 主要的源代码区
   - java 具体的代码层

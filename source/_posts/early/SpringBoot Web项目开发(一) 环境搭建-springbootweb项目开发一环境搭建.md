@@ -29,11 +29,11 @@ MySQL版本为5.7.25
 Maven使用IDEA自带:
 配置阿里镜像源:打开IDEA，File->settings
 
-![settings Maven配置界面](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/image-6f86f7b3534efc8beea3605a38cbbf89-603c10-1610093064.png?x-oss-process=style/mxcompress)
+![settings Maven配置界面](./assets/img/image-6f86f7b3534efc8beea3605a38cbbf89-603c10-1610093064.png?x-oss-process=style/mxcompress)
 
 Build->Build Tools->Maven 中User settings file可以查看当前maven的配置项，打开路径对应文件。
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/code-1024x962-9fd180e94b6f4c39f337826276a85612-f13f0b-1610093081.png?x-oss-process=style/mxcompress)
+![img](./assets/img/code-1024x962-9fd180e94b6f4c39f337826276a85612-f13f0b-1610093081.png?x-oss-process=style/mxcompress)
 
 找到xml文件中mirrors标签，添加以下代码
 
@@ -53,13 +53,13 @@ Build->Build Tools->Maven 中User settings file可以查看当前maven的配置�
 
 IDEA -> File -> new project -> Spring Initializr
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/image-2-c01e335af8aa7df297d410e301476c8e-6bfc6e-1610093103.png?x-oss-process=style/mxcompress)
+![img](./assets/img/image-2-c01e335af8aa7df297d410e301476c8e-6bfc6e-1610093103.png?x-oss-process=style/mxcompress)
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/image-3-a14b40a6b746c315bd60a322a18f30d8-e798c4-1610093115.png?x-oss-process=style/mxcompress)
+![img](./assets/img/image-3-a14b40a6b746c315bd60a322a18f30d8-e798c4-1610093115.png?x-oss-process=style/mxcompress)
 
 接下来选择项目依赖，具体依赖根据项目需求选择，后期也可以在pom.xml中修改
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/image-4-bb52f36d371102cd655b6af50120313b-ec34aa-1610093175.png?x-oss-process=style/mxcompress)
+![img](./assets/img/image-4-bb52f36d371102cd655b6af50120313b-ec34aa-1610093175.png?x-oss-process=style/mxcompress)
 
 main中为项目源代码，MarketApplication.java为项目启动入口；
 resources为静态资源目录，application.properties为项目的配置文件，配置文件还有 application.yml 的yml类型。

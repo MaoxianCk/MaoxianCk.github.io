@@ -21,9 +21,9 @@ tags:
 - 端口正确开放
 - 防火墙等的配置（避免在读取二进制日志时出现问题）
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress)
+![img](./assets/img/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress)
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/33e2a5a631164c121e05e5fb3b922534-0ef7b2-1610094861.jpeg?x-oss-process=style/mxcompress)
+![img](./assets/img/33e2a5a631164c121e05e5fb3b922534-0ef7b2-1610094861.jpeg?x-oss-process=style/mxcompress)
 
 ## 修改数据库配置文件 /etc/my.cnf
 
@@ -67,7 +67,7 @@ systemctl restart mysqld.service
 show master status;
 ```
 
-![img](https://img-maoxian-fun.oss-cn-hangzhou.aliyuncs.com/MxBlogImg/efc3cc448668a197371dc3b9b2bf0a39-87e9c4-1610094876.jpeg?x-oss-process=style/mxcompress)
+![img](./assets/img/efc3cc448668a197371dc3b9b2bf0a39-87e9c4-1610094876.jpeg?x-oss-process=style/mxcompress)
 
 如图，记录的File值为master_01.000001，Position值为2653
 
