@@ -1,0 +1,22 @@
+navbar:
+  blog_title: 毛线球上的喵星人
+
+
+fun_features:
+  typing: # 为 subtitle 添加打字机效果
+    enable: true
+    typeSpeed: 80 # 打印速度
+
+# 文章页
+index:
+  banner_img: /asset/images/default-bg.jpg
+  slogan:
+    enable: true
+    text: 旅人, 你好啊.
+
+post:
+  banner_img: /asset/images/default-bg.jpg
+
+color:
+  navbar_bg_color: "#2f4154"
+  navbar_bg_color_dark: "#1f3144"
