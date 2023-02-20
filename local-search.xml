@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>计算机中的会话(Session)</title>
+    <link href="/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%AD%E7%9A%84%E4%BC%9A%E8%AF%9D-session/"/>
+    <url>/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%AD%E7%9A%84%E4%BC%9A%E8%AF%9D-session/</url>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>首先明确，这里主要论述的Session并不是指具体的各个语言的实现，而是单指Session（会话）的技术。</p><h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>标准HTTP协议请求本身是无状态的，也就是说，用户A和B同时向服务器发送了一个请求，服务器是无法判断这两个请求分别是来自于A还是B还是C。</p><p>为了实现有状态的HTTP请求，即在业务上服务端需要知道每一个请求分别来自于谁，就需要在HTTP的基础上，在应用业务上实现这么一个功能来维持用户的状态，从而将登录、和后续用户操作等等多个独立的HTTP请求联系起来，这就是Session。</p><p>换个说法，将客户端和服务端之间的多个独立HTTP请求起来关联，并识别请求的用户身份，能够实现这样一种功能的，就是Session（会话）</p><h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>那么，Session的实现方案有哪些？Token、JWT、PHP Session和Tomcat Session等等都是什么鬼？</p><p>一个个来说这些东西，但是先说一下Cookie。</p><h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p>cookie是<em>由浏览器</em>实现的一个最基本的功能，诞生之初就是为了分辨用户身份而存储在客户端内存或硬盘上的数据块，大小通常为4kb。</p><p><strong>优点：</strong><br>    1. Cookie历史较久，功能基本比较完善，具有生存周期Expires、有效访问路径Path、域名等等属性完善其安全性和有效性。<br>    2. 可以由服务端在请求的Response中带上Set-Cookie属性对客户端的Cookie进行设置而不需要前端额外实现。<br>    3. 浏览器在请求时会自动带上该网站对应的Cookie发送给服务端。</p><p><strong>缺点：</strong><br>    1. 通常大小为4kb，在现代化网站中，可能不够用。<br>    2. 浏览器会在每个HTTP请求中，都自动带上Cookie进行请求，若Cookie较多，占用服务器带宽。<br>    3. 容易被污染，从而导致隐私泄漏，商家可依此完善用户画像，实现广告跟踪。<br>    4. Cookie可被用户禁用，影响业务。<br>    5. 非浏览器应用，如App，没有Cookie。</p><h2 id="PHP、Tomcat-默认的Session"><a href="#PHP、Tomcat-默认的Session" class="headerlink" title="PHP、Tomcat 默认的Session"></a>PHP、Tomcat 默认的Session</h2><p>大多数Web容器、应用框架都提供了Session的一种默认实现方式，基本原理就是在客户端的Cookie中放一个SessionID，然后在服务器的内存中以SessionID作为key，存储对应用户的状态数据。PHP中是PHPSESSID，Tomcat是JSESSIONID。</p><h2 id="Token、JWT"><a href="#Token、JWT" class="headerlink" title="Token、JWT"></a>Token、JWT</h2><p>Token（令牌）是将用户的状态数据直接存储到客户端，而不是存储在服务端中。用户在登录成功之后，服务端将用户信息和其他数据通过某种规则和编码转换成一个Token字符串，并返回给客户端，客户端在请求服务端时，带上这个Token，服务端只需要验证这个Token是否正确、有效，就可以从里面得到用户信息，而不需要在服务器上花费空间进行存储。</p><p>类似的比喻，比如试卷、合同上的签名和印章，在验证文件内容真伪时，只需要验证签名或印章的痕迹是否真实有效，即可认为文件内容是否有效。</p><p><a href="https://jwt.io/">JWT(JSON Web Tokens)</a>，就是Token的一种标准(RFC 7519)，定义了一种基于Json的Token方案，包含了用户数据、校验字段以及签名策略，使jwt本身可以包含用户数据，并且不会被篡改。</p><h2 id="演化"><a href="#演化" class="headerlink" title="演化"></a>演化</h2><p>这里以一个简单的web应用进行演化。</p><p>在Http协议诞生之初，只是为了从服务端获取简单的静态Html数据，静态页面嘛，直接Get完请求就可以了，也不需要处理上下文之间的交互。但是渐渐的，网站有了用户账号的设计，BBS、电商、即时聊天、游戏对战等等一系列需要客户端和服务端有状态的会话需求，服务端需要知道每一个无状态的HTTP请求对应的用户是谁，所以就需要在HTTP请求中带上身份识别，这时候就可以利用<strong>Cookie</strong>。</p><p>用户在登录成功时，服务端通过Set-Cookie在客户端的Cookie中保存用户身份，比如用户的ID，那么用户在登录成功后，选好商品添加购物车的时候，欸就可以把Cookie中的用户id带上，那么服务端就可以知道，这个购物车的操作是由这个id的用户做的。</p><p>乍一看，好像这个方法不错，可以实现用户的状态维持。但是Cookie在客户端上是明文保存的，可以随意修改，如果某个人把cookie里的id进行修改，把id修改成别人的，那不是就可以伪造用户请求了？而且随着业务的发展，用户需要保存的信息也越来越多，比如用户权限、用户身份、上下文一些关联的业务数据等，如果这些数据也都明文保存在客户端，这明显很不安全。</p><p>那么就到了<strong>session</strong>（狭义上的），把用户数据存储在服务器的内存里，用户和服务端建立联系的时候，服务端创建一个SessionID，把SessionId放到Cookie里，每次请求带上SessionID，服务端就可以根据这个来查到存储在内存里的用户信息。同时客户端只需要存储SessionID，并且这个id本身只是一个Key，那么就可以使用一些算法，使id变的较长且无规律，不容易被随意修改伪造。到这里，这也是现在大多数web框架内置session的实现方案，简单好用。</p><p>经过了多年的发展，这个web应用的用户数量也逐渐多了起来，一台服务器显然不能够很好的满足逐渐膨胀的用户和业务发展，那么就需要添加服务器做负载均衡共同提供服务。</p><p>问题来了，之前的用户数据是存放在服务器的内存里的，也就是用户上一次是在A服务器里处理的登录请求，那下一次用户的请求发到了B里，不是就变的没有登录了吗？</p><p>处理的方案也有几种：服务器间session复制，服务器间互相同步、互相备份；在负载均衡的时候做粘连，把来自同一个用户的请求粘连在同一个服务器上；session集中存储，利用Redis等高性能第三方存储把session放到业务服务器外等等方案，这些方案都互相有优缺点，这里暂不详细展开。</p><p>再回到开始的直接存储用户id的方案上，这个方案最大的问题就是单纯的用户id容易被篡改，那么是不是只要不让他被随意篡改就可以了？一个不会被随意篡改、又不用在服务器上面存储方案是不是就很完美？</p><p>这是<strong>Token</strong>的方案，在登录成功后，服务端给用户一个身份凭证，上面有用户的信息，同时，服务端对这个凭证签名，让他不能被随便修改，比如对用户信息和时效信息加上服务端的私钥签名，在没有拿到服务端的私钥下，谁都不能伪造出这份签名，同时又可以通过服务端的公钥进行验证。</p><p>Token的方案可以自行设计，不过业界已经有一个广泛应用的标准JWT，大部分场景直接根据这个标准进行开发就可以了。</p><p>Token实现了HTTP请求的有状态和服务端的无状态，服务端上的不同服务器不需要花费空间来存储每一个用户的用户数据，转而只需要对token进行验证就可以了，经典的时间换空间，而且可以提高服务器的伸缩性，可以随意的添加业务服务器，而不需要额外处理session的各种问题。</p><p>但是把Token当作凭证发放给客户端后，又怎么对客户端的用户进行管理？比如用户修改了密码，之前颁发的凭证需要失效，但是Token是在客户端上的，服务端无法主动失效Token，这是一个问题。那有人肯定会说，可以把Token在服务端上存一份呀，如果失效了给他打个标记，或者直接删除，不是就可以管理了吗？是的，这样确实可以在服务端上对Token进行管理，但是这样，服务端也从无状态变回了有状态，又需要处理Token在服务端上的存储、共享等等问题，和session有什么本质上的区别吗？</p><p>上面的不论sessionID还是token都是存放在cookie里的，但是要注意，这个cookie只是浏览器都支持自动处理的一个headers而已，所以在具体实现上，不论是sessionID还是token都可以放到其他的header头里，区别就是需要客户端代码自行处理而已，包括App等非浏览器应用。</p><p>综上所述，各种方案实现都有相对应的好处和问题，没有哪种方案是完美的，在一个应用中，需要根据业务本身的用户规模、服务器情况、安全程度、业务逻辑和用户体验，选择适合的方案，或是互相结合在不同的场景使用不同的方案。</p><h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><p>互联网应用最重要的问题就是安全，各种Session技术、加密算法都是为了增加攻击成本、提高安全性。</p><p>上面的方案中，很明显有一个致命的问题，每个方案基本都依赖于服务端给客户端发送的一组识别用户身份的字符串，那假如有人在中间抓包，拿到这个字符串，是不是就不安全了。是的，这是中间人攻击的一种方式。</p><p>如何避免，这个问题如果基于HTTP是没有很好的方案的，较好的方案就是使用HTTPS，基于可信根证书和端到端的加密来实现整个链路上的传输安全。</p><p>通过其他字段综合对用户身份进行验证，比如设备MAC、IP地址等信息综合判断。</p><p>在核心重要功能如支付，使用二次验证（密码、短信等）。</p><p>减少token的有效时间，并在每次请求中对token进行刷新。</p><p>安全的前提是客户端安全，如果客户端本身状态危险，那么任何的安全措施都是无效的。</p><p>用户需要做的：</p><ol><li>保持操作系统安全，不被挂马、不被其他人操作，这是设备的安全。</li><li>使用可靠的浏览器、确认浏览器的各种设置。</li><li>避免安装不可信的CA根证书（数字证书），证书是保证HTTPS安全的前提，通常受信的证书是内置在操作系统中的，以及用户自行安装的，比如常见的网银证书。如果安装不可信的假CA证书，那么攻击者就可以伪造CA证书，自己对自己的请求进行签发，欺骗客户端，由于客户端安装了假CA证书，并不会对中间人的伪造证书报警。</li><li>确认网站地址正确，确认证书的有效性和签发机构。</li><li>代理，使用代理上网，那么代理本身就是一个中间人……</li><li>注意防范社工，社会工程学攻击。</li></ol><p>服务端需要做的：</p><ol><li>使用HTTPS</li><li>业务上对XSS、CROS等等攻击手段进行防范</li><li>使用验证码防止暴力</li><li>保证服务器本身及内网安全</li><li>敏感操作要求二次验证</li><li>对用户设备、ip进行绑定和验证</li><li>不使用任何自己想的奇奇怪怪的加密方式和算法。古典密码学的编码和破译通常依赖于算法本身的设计和对手的想象力和创造力，一但算法公开就不具备安全性，而现代密码学的安全性依赖于密钥而不是算法本身的保密性。而目前常用的密码学算法都是开源且经过了各种专家的验证和分析，适用场景、破解成本、优缺点已经很明确且公开，在不出现重大技术突破的情况下，可以基本保证安全。</li></ol><h1 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h1><p>上面所说的都只是互联网应用中认证与授权中的认证，即“我是谁”的问题。而授权则是控制用户对于系统的访问权限。</p><p>在系统庞大、功能复杂的情况下，可能会有多个完全不同的域名，或者是其他第三方登录的实现。那么就有了SSO和OAuth</p><p>SSO是单点登录，主要是处理一个公司的不同系统下的访问登录问题（如淘宝和天猫，他们的域是不同的，但是可以相互跳转不需要重新认证）</p><p>OAuth主要是不同公司间的授权方案，授权用户在第三方应用中访问自己在自己系统的一些隐私数据，比如一些网站的qq登录、微博登录等第三方账号登录。</p><p>这部分具体的内容在此不展开描述只是作为相关点提一下，后续可能会继续更新相应文章展开。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>信息安全</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Web</tag>
+      
+      <tag>Session</tag>
+      
+      <tag>Cookie</tag>
+      
+      <tag>信息安全</tag>
+      
+      <tag>认证</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>编码算法</title>
+    <link href="/%E7%AE%97%E6%B3%95%E7%9B%B8%E5%85%B3/%E7%BC%96%E7%A0%81%E7%AE%97%E6%B3%95/"/>
+    <url>/%E7%AE%97%E6%B3%95%E7%9B%B8%E5%85%B3/%E7%BC%96%E7%A0%81%E7%AE%97%E6%B3%95/</url>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>严格来说，编码并不算在信息安全里，只是将信息使用另一个形式进行传输或者是表面上的不可阅读而已。</p><h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><p>网上说的最多的就是Base64。“用Base64加密一下“，这种说法是不严谨的，因为它只能够实现肉眼上的不可读。<br>Base64算法是一种编码算法，将二进制数据使用64个ASKII字符表达，主要用于解决二进制数据在不同端的不兼容问题。一些特殊的二进制流在不同的设备、系统中可能表示的意义不同，同时老设备、早期的软件、系统、协议对二进制数据的处理方式也可能不相同，但是基于ASKII的编码在大多数设备的行为都是一致的。</p><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>将 字符/二进制 数据按字节(ASKII | 8位)进行拆分，其中若拆分后二进制不足8位则在前面补0，拆分之后检查，如果总字节数不能被3整除(最少3个字节才能转换成4个Base64字节)，则在最后补0使总字节数可被3整除，再以6位为一组按照Base64映射表进行编码(2^6=64)，编码后，按照之前末尾补零的数量，在编码末尾添加对应的’=’表示补0的数量。</p><p><strong>Base64映射表</strong></p><table><thead><tr><th align="left">数值</th><th align="left">字符</th><th></th><th align="left">数值</th><th align="left">字符</th><th></th><th align="left">数值</th><th>字符</th><th></th><th>数值</th><th>字符</th></tr></thead><tbody><tr><td align="left">0</td><td align="left">A</td><td></td><td align="left">16</td><td align="left">Q</td><td></td><td align="left">32</td><td>g</td><td></td><td>48</td><td>w</td></tr><tr><td align="left">1</td><td align="left">B</td><td></td><td align="left">17</td><td align="left">R</td><td></td><td align="left">33</td><td>h</td><td></td><td>49</td><td>x</td></tr><tr><td align="left">2</td><td align="left">C</td><td></td><td align="left">18</td><td align="left">S</td><td></td><td align="left">34</td><td>i</td><td></td><td>50</td><td>y</td></tr><tr><td align="left">3</td><td align="left">D</td><td></td><td align="left">19</td><td align="left">T</td><td></td><td align="left">35</td><td>j</td><td></td><td>51</td><td>z</td></tr><tr><td align="left">4</td><td align="left">E</td><td></td><td align="left">20</td><td align="left">U</td><td></td><td align="left">36</td><td>k</td><td></td><td>52</td><td>0</td></tr><tr><td align="left">5</td><td align="left">F</td><td></td><td align="left">21</td><td align="left">V</td><td></td><td align="left">37</td><td>l</td><td></td><td>53</td><td>1</td></tr><tr><td align="left">6</td><td align="left">G</td><td></td><td align="left">22</td><td align="left">W</td><td></td><td align="left">38</td><td>m</td><td></td><td>54</td><td>2</td></tr><tr><td align="left">7</td><td align="left">H</td><td></td><td align="left">23</td><td align="left">X</td><td></td><td align="left">39</td><td>n</td><td></td><td>55</td><td>3</td></tr><tr><td align="left">8</td><td align="left">I</td><td></td><td align="left">24</td><td align="left">Y</td><td></td><td align="left">40</td><td>o</td><td></td><td>56</td><td>4</td></tr><tr><td align="left">9</td><td align="left">J</td><td></td><td align="left">25</td><td align="left">Z</td><td></td><td align="left">41</td><td>p</td><td></td><td>57</td><td>5</td></tr><tr><td align="left">10</td><td align="left">K</td><td></td><td align="left">26</td><td align="left">a</td><td></td><td align="left">42</td><td>q</td><td></td><td>58</td><td>6</td></tr><tr><td align="left">11</td><td align="left">L</td><td></td><td align="left">27</td><td align="left">b</td><td></td><td align="left">43</td><td>r</td><td></td><td>59</td><td>7</td></tr><tr><td align="left">12</td><td align="left">M</td><td></td><td align="left">28</td><td align="left">c</td><td></td><td align="left">44</td><td>s</td><td></td><td>60</td><td>8</td></tr><tr><td align="left">13</td><td align="left">N</td><td></td><td align="left">29</td><td align="left">d</td><td></td><td align="left">45</td><td>t</td><td></td><td>61</td><td>9</td></tr><tr><td align="left">14</td><td align="left">O</td><td></td><td align="left">30</td><td align="left">e</td><td></td><td align="left">46</td><td>u</td><td></td><td>62</td><td>+</td></tr><tr><td align="left">15</td><td align="left">P</td><td></td><td align="left">31</td><td align="left">f</td><td></td><td align="left">47</td><td>v</td><td></td><td>63</td><td>/</td></tr></tbody></table><p><strong>举例说明</strong><br>这里以文本数据进行解释说明，容易理解。</p><table style="text-align: center">  <tr>    <td>文本</td>    <td colspan="6">Mx</td>  </tr>  <tr>    <td>字符</td>    <td colspan="3">M</td>    <td colspan="3">x</td>    <td>按照字符拆分</td>  </tr>  <tr>    <td>Askii码</td>    <td colspan="3">1001101</td>    <td colspan="3">1111000</td>    <td>字符对应的askii码</td>  </tr>  <tr>    <td>补零</td>    <td colspan="3"><b>0</b>1001101</td>    <td colspan="3"><b>0</b>1111000</td>    <td>在前面补零至8位</td>  </tr>  <tr>    <td>分组</td>    <td colspan="2">010011</td>    <td colspan="2">010111</td>    <td colspan="2">1000<b>00</b></td>    <td>按6位一组重新分组</td>  </tr>  <tr>    <td>编号</td>    <td colspan="2">19</td>    <td colspan="2">23</td>    <td colspan="2">32</td>    <td>转换10进制</td>  </tr>  <tr>    <td>转码</td>    <td colspan="2">T</td>    <td colspan="2">X</td>    <td colspan="2">g</td>    <td>根据编号和表格进行编码</td>  </tr>  <tr>    <td>结果</td>    <td colspan="6">TXg=</td>    <td>由于总字节数为2，不能被3整除，所以补1个等号</td>  </tr></table><h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol><li>一些文本传输协议不支持”不可见字符”的传输，如SMTP等，需要将其转码成可见文本进行传输。</li><li>将小图片或小文件转换成base64后，就可以将二进制数据当作字符串在不同异构系统中进行传输、保存。</li><li>肉眼上的不可见，base64本身算法不复杂，编码和解码本身性能开销很小，但是对于人脑还是较麻烦的。</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>算法相关</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>编码</tag>
+      
+      <tag>Base64</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>关于数据结构的一些想法</title>
+    <link href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95/"/>
+    <url>/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95/</url>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>写这篇文章的动机呢，其实是洗澡的时候突然想到，并结合平时中的一些感受所产生的：大多数学数据结构的人，总是给我一种为了学数据结构而学的感觉。</p><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>数据结构和算法，这两个好兄弟不论是在本科的课程里还是在面试中，都是最基础的考察项目。但是大多数人，在刚刚入门的时候，比如刚学习完一门语言的语法，准备深入学习的时候，就会有人告诉说：该学数据结构了。然后从天而降一个链表让你学，学会了用就完事了，迷迷糊糊学完之后，又塞来一个二叉树…</p><h2 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h2><p>一般在教材中，每个不同的结构都是分成不同的章节进行讲解的，通常是列表、树、图…这样的顺序展开。从分类和学习进度上，这样并没有问题，但是在学习的时候，由于每个部分被分成不同的章节，而在表面上看起来没有关联。<br>这就是问题所在，每一种数据结构都是层层递进的。</p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>每一个数据结构和算法都是根据需要而被一个个发明创造出来的。链表、栈、树、图…这些东西不是一开始就存在，而是根据需要而被前辈发明出来，并且经过抽象和提炼后，总结出最基础、最<strong>常用</strong>的这几种结构作为入门。但是我们在学习的时候，不是为了学习掌握这种结构，而是需要掌握如何<strong>创造</strong>结构。<br>数组不够灵活，所以有了能够灵活分配空间的单链表；单链表只能向后不能往前，所以就有了前后指针的双向链表；数组和链表的操作太多了，我只需要排队或者做一个桶的功能，所以屏蔽了多余的功能，有了以数组或链表为基础的栈和队列；链表是一维的线性结构，查找只能从头或尾巴依次遍历，效率太低怎么办？把一维的线性结构转换为非线性的，把单链表的next指针拆分成两个(left和right)并规定比我小的在左边，大的在右边，于是便有了二叉排序树；排序树依赖插入顺序，最差情况(左斜树或右斜树)还是退化成一个链表，那就规定左右子树的高度差不能超过1，不平衡的时候需要通过左右旋的操作保持平衡，这就成了AVL平衡树。在此基础上，对<strong>条件、性能的不同要求</strong>，从而不断的改造出了B树、红黑树等等亚种。<br>那图呢？一样的，链表和数组既然只能存储一维的信息，那用两个链表或者数组套起来，不就是二维的吗？链表的每个节点保存每个子链表的头结点，每个一级数组保存子数组的起点，不就是二维的吗？此上结合数论，将图拆分成点和边分别存储，于是就有了以数组为基础的邻接表，以链表为基础的十字链两种存储图的方式，甚至还有结合数组和链表的多重邻接表。</p><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>说了这么多，其实总结就一些。学数据结构学的不是结构本身，而是研究结构是如何被创造出来的，如何根据需要 去创造新的高效的方案。换句话说，就是无招胜有招，在掌握本质之后，就可以根据需要直接创造出需要的结构。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>数据结构-算法</category>
+      
+      <category>闲聊</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>数据结构</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue项目在Nginx非root目录下部署的问题</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/</url>
+    
+    <content type="html"><![CDATA[<h2 id="错误排查"><a href="#错误排查" class="headerlink" title="错误排查"></a>错误排查</h2><p>最近在部署Vue项目时，出现如下错误：</p><p><img src="./assets/img/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress" alt="img"></p><p>一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。</p><p>比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下：</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nginx">/      用户端<br>/<span class="hljs-attribute">admin</span> 管理员端<br></code></pre></td></tr></table></figure><p>尝试将管理员端项目部署在原用户端根路径上时，发现又正常，于是推测是项目部署在Nginx的非root即 ‘/’ 根路径上出了问题。</p><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改管理员端项目的配置文件</p><p>该项目使用的是vue-cli3，故修改vue.config.js文件</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs nginx">module.<span class="hljs-attribute">exports</span> = &#123;<br>  // publicPath: &#x27;./&#x27;,   // 注释原配置<br>  publicPath: &#x27;/admin/&#x27;, // 修改为要配置的路径，注意两个斜杠<br>  其他配置...<br>&#125;<br></code></pre></td></tr></table></figure><p>重新build项目，检查打包后的dist文件夹中的index.html文件的资源引用路径是否正确（publicPath打头的路径）</p><p><img src="./assets/img/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png?x-oss-process=style/mxcompress" alt="img"></p><p>修改nginx配置文件，nginx.conf</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-comment"># 用户端路径，使用root配置</span><br><span class="hljs-section">location</span> / &#123;<br>    <span class="hljs-attribute">root</span>   html/dist;<br>    <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ <span class="hljs-variable">@router</span>;<br>    <span class="hljs-attribute">index</span>  index.html index.htm;<br>&#125;<br><span class="hljs-comment"># 管理员端配置，使用alias配置虚拟路径，匹配路径时使用rewrites重写定位</span><br><span class="hljs-section">location</span><span class="hljs-regexp"> ^~/admin</span> &#123;<br>    <span class="hljs-attribute">alias</span> html/admin/;<br>    <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ <span class="hljs-variable">@rewrites</span>;<br>&#125;<br><span class="hljs-comment"># 将管理员端路径重写定位</span><br><span class="hljs-section">location</span> <span class="hljs-variable">@rewrites</span>&#123;<br>    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(admin)/(.+)$</span> /<span class="hljs-variable">$1</span>/index.html <span class="hljs-literal">last</span>;<br>&#125;<br><span class="hljs-comment"># 后端代理</span><br><span class="hljs-section">location</span> /local &#123;<br>    <span class="hljs-attribute">proxy_pass</span>  http://localhost:8080/;<br>&#125;<br></code></pre></td></tr></table></figure><p>执行 nginx -t 检查配置文件</p><p>执行 nginx -s reload 重载配置文件</p><p>完事。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>Web</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>Web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>编程的乐趣</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B9%90%E8%B6%A3/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B9%90%E8%B6%A3/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>编程为什么有趣？作为回报，它的从业者期望得到什么样的快乐？</p><p>首先是一种创建事物的纯粹快乐。如同小孩在玩泥巴时感到愉快一样，成年人喜欢创建事物，特别是自己进行设计。我想这种快乐是上帝创造世界的折射，一种呈现在每片独特、崭新的树叶和雪花上的喜悦。</p><p>其次，快乐来自于开发对其他人有用的东西。内心深处，我们期望其他人使用我们的劳动成果，并能对他们有所帮助。从这个方面，这同小孩用粘土为 “爸爸办公室” 捏制铅笔盒没有本质的区别。第三是整个过程体现出魔术般的力量 —— 将相互啮合的零部件组装在一起，看到它们精妙地运行，得到预先所希望的结果。比起弹珠游戏或点唱机所具有的迷人魅力，程序化的计算机毫不逊色。</p><p>第四是学习的乐趣，来自于这项工作的非重复特性。人们所面临的问题，在某个或其它方面总有些不同。因而解决问题的人可以从中学习新的事物：有时是实践上的，有时是理论上的，或者兼而有之。</p><p>最后，乐趣还来自于工作在如此易于驾驭的介质上。程序员，就像诗人一样，几乎仅仅工作在单纯的思考中。程序员凭空地运用自己的想象，来建造自己的 “城堡”。很少有这样的介质 —— 创造的方式如此得灵活，如此得易于精炼和重建，如此得容易实现概念上的设想。（不过我们将会看到，容易驾驭的特性也有它自己的问题）</p><p>然而程序毕竟同诗歌不同，它是实实在在的东西；可以移动和运行，能独立产生可见的输出；能打印结果，绘制图形，发出声音，移动支架。神话和传说中的魔术在我们的时代已变成了现实。在键盘上键入正确的咒语，屏幕会活动、变幻，显示出前所未有的或是已经存在的事物。</p><p>编程非常有趣，在于它不仅满足了我们内心深处进行创造的渴望，而且还愉悦了每个人内在的情感。</p><p>– 摘自《人月神话》</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>闲聊</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>关于计算机的 Boot</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/</url>
+    
+    <content type="html"><![CDATA[<p>boot是bootstrap的简写形式，当然这里的bootstrap不是指<a href="https://getbootstrap.com/">web框架</a>的bootstrap，而是指计算机的“引导”。</p><p>bootstrap原意是靴子，但是这跟计算机有什么关系呢？</p><p>这源于一句谚语：</p><blockquote><p>pull oneself up by one’s bootstraps</p><p>拽着鞋带把自己拉起来</p></blockquote><p>这个句子很有意思，就像左脚踩右脚不断交替就能上天一样。</p><p>工程师把这个用来比喻计算机启动的过程，原因是因为：计算机上的大多数程序是由其他程序加载到计算机上的，那就意味着需要有一个机制将初始程序加载到计算机上。换句话说就是，计算机需要启动才能运行程序，而运行程序则需要启动计算机，而这明显是不能实现的。</p><p><em>解释清楚死锁，我们就雇你；雇我我就解释给你听；来吧，我们讨论一下薪水的事情吧！</em></p><p>早期的工程师使用各种方法把程序放入内存中以临时解决该问题，直到后来<strong>Rom</strong>的出现彻底解决了这个问题。</p><blockquote><p>Read-only memory (ROM) is a type of non-volatile memory used in computers and other electronic devices. Data stored in ROM cannot be electronically modified after the manufacture of the memory device. </p><p>摘自<a href="https://en.wikipedia.org/wiki/Read-only_memory">wiki</a></p></blockquote><p>翻译：只读存储器是一种在计算机和其他电子设备中使用的非易失性存储设备。存储在Rom中的数据一经制造就无法以电子方式修改。</p><p>当然，随着科技的发展，Rom已经发展出了许多种类：可编程只读存储器（PROM）、可擦可编程序只读存储器（EPROM）和电可擦可编程只读存储器ROMROM（EEPROM），Rom已经不再是出厂就无法修改，从而也衍生出刷BIOS、刷Rom等操作了。</p><p>而现在，这个Rom就存在计算机的主板上，里面写入的程序呢，就是<strong>BIOS</strong>。</p><p><strong>BIOS ( Basic Input Output System )</strong> ，是计算机启动后运行的第一个程序。这个程序的功能就是最基本的输入输出、计算机自检和系统自启功能。</p><p>计算机启动后，运行BIOS，首先进行自检，检查计算机上的硬件（CPU、内存等）是否满足运行的条件，若没有问题则转入下一阶段，否则报警并中止。</p><p>自检没有问题，那么下一步就是决定启动顺序。</p><p>经常装系统的同学可能很熟悉这个操作：插上U盘，按下开机键（短接电源），猛按f8或者某个按键，在屏幕弹出来的窗口上选择U盘，然后就进入PE或者是系统安装程序进行系统的安装。</p><p><img src="./assets/img/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress" alt="img"></p><p>BIOS启动后，需要运行下一个程序，也就是要找到下一个启动程序所在的存储设备（例如硬盘或者U盘）。</p><p>BIOS根据用户选择的启动设备或者是默认的启动顺序，判断该设备是否可用于引导（判断设备的第一个扇区，最前面的512字节的最后两个字节是否是0x55和0xAA，这512个字节就叫MBR 主引导记录）</p><p>现在知道设备可用于启动了，那么现在就需要知道该到哪去运行下一个程序。而MBR中存储的就是操作系统在该设备上的位置，下一步就显而易见了，找到操作系统，启动！</p><p><img src="./assets/img/b864d20e64f6e15e211f6017b3af5981-d3c0bd-1610095362.png?x-oss-process=style/mxcompress" alt="img"></p><p>文章篇幅看似挺长，对于今天的计算机来讲，不过是“弹指一瞬间”，按下开机按钮，不出一会屏幕上就显示出操作系统的启动动画，或者对于土豪玩家，说不定已经能看到桌面了（汗。</p><p>当然，上文中描述的启动顺序也并不完整，其中省略了一些关于分区表的部分，并且文章中说的MBR+BIOS的引导启动已经是过去式了，现在的引导方式也都变成了GPT+UEFI的形式。</p><p>MBR和GPT其实都是分区表的两种种类，MBR是512字节，一个主分区的扇区总数不超过2^32即逻辑地址有32位，而每个扇区大小512字节，2^32*512即2T，所以MBR支持的最大容量为2T；而GPT逻辑地址提升至64位，则理论最大分区大小为2^64-1*512即18eb（1eb=1024pb=1024^2tb）。</p><p>UEFI和BIOS的话，可以说UEFI相当于BIOS的升级版，兼容性、容错性、纠错性等更好，具体参见<a href="https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface">Wiki</a>。</p><p>总的来说，系统启动的过程就像多米诺骨牌一样，由小到大，从一开始的BIOS逐步启动到操作系统。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>闲聊</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SQL根据不同的条件查询count</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2count/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2count/</url>
+    
+    <content type="html"><![CDATA[<p>在一条语句中根据不同的条件count对应的数据。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-built_in">count</span>(if(条件, <span class="hljs-literal">true</span>, <span class="hljs-keyword">null</span>)), <span class="hljs-built_in">count</span>(if(条件, <span class="hljs-literal">true</span>, <span class="hljs-keyword">null</span>)) <span class="hljs-keyword">from</span> <span class="hljs-keyword">table</span>;<br></code></pre></td></tr></table></figure><p>以上语句可以根据两个不同的条件一次计算出对应的count值，很明显的用到的是IF函数。IF( expr1, expr2, expr3)。</p><blockquote><p>以下来自<a href="https://dev.mysql.com/doc/refman/5.7/en/control-flow-functions.html">官方文档</a>的说明</p><p>If expr1 is TRUE (expr1 &lt;&gt; 0 and expr1 &lt;&gt; NULL), IF() returns expr2. Otherwise, it returns expr3.</p></blockquote><p>用到count中，即if的条件为真，则if子句返回true，否则返回null。count子句依据该返回值进行计数。</p><p>具体的条件依据需求变化，例如需要去重，可以变为count(distinct if(条件, expr2, expr3))</p><p>同理，if也可用于sum等其他聚合函数计算。</p><p><strong>注意：</strong></p><p><em>第一条sql语句中的返回值不一定为true, null 可依据需求调整，该文章仅作参考。</em></p><p><em>该文章测试环境为</em> <em><strong>Mysql 5.7.25</strong></em></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>Sql</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>Sql</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Sqlite Attach和Detach</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/Sql/sqlite-attach%E5%92%8Cdetach/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/Sql/sqlite-attach%E5%92%8Cdetach/</url>
+    
+    <content type="html"><![CDATA[<p>sqlite是基于文件的数据库，正常使用sql语句操作一般都是同一个数据库，即同一个文件。若要同时操作多个sqlite数据库呢，这时候就可以用Attach和Detach语法。</p><p>Attach 附加数据库，将一个数据库文件附加到当前连接上。</p><p>Detach 分离数据库，跟Attach相反，即分离附加的数据库。</p><p>假设现在有两个数据库文件，”Main.db”和”Main_Bak.db”。</p><p>Main数据库中有一个user表如下：</p><p><img src="./assets/img/70b3338d971672a212404a0d8a3e1aae-63131e-1610094720.png?x-oss-process=style/mxcompress" alt="img"></p><p>Main_Bak数据库为空，没有任何表和数据。</p><p>现在仅连接Main_Bak数据库。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sqlite">attach database &#x27;Main.db&#x27; as MainDB; # 路径应为绝对路径，此处略去了<br></code></pre></td></tr></table></figure><p>表示将Main.db这个数据库文件附加到当前连接的数据库上，也就是现在可以同时操作两个数据库，Main中的表即可以通过”MainDB.表名”的形式索引到。</p><p>测试一下</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sqlite">select * from MainDB.user; # 在Main_Bak数据库中查询Main数据库的信息<br></code></pre></td></tr></table></figure><p><img src="./assets/img/2c09e4b145e3277cd3158227524bda29-18f894-1610094731.png?x-oss-process=style/mxcompress" alt="img"></p><p>结果正确</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sqlite">create table user_bak as select * from MainDB.user; # 以Main数据库中user表的结构和数据在Main_bak数据库中建表<br></code></pre></td></tr></table></figure><p><img src="./assets/img/484fbfae2091eca9b1211cead74bf72e-e3a9f9-1610094740.png?x-oss-process=style/mxcompress" alt="img"></p><p>操作成功，同时操作了两个数据库文件。</p><p>最后分离已附加上的数据库</p><p>detach database MainDB;</p><p>若此时再次执行上文中的查询语句便会报错</p><p><img src="./assets/img/f208d5e5ce8e1fcec42f85b52ed231be-98f0dd-1610094747.png?x-oss-process=style/mxcompress" alt="img"></p><p>参考资料:</p><p><a href="https://www.sqlite.org/lang_attach.html">https://www.sqlite.org/lang_attach.html</a></p><p><a href="https://www.runoob.com/sqlite/sqlite-attach-database.html">https://www.runoob.com/sqlite/sqlite-attach-database.html</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>Sql</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>Sql</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SVN的使用及代码合并</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/</url>
+    
+    <content type="html"><![CDATA[<h2 id="客户端使用"><a href="#客户端使用" class="headerlink" title="客户端使用"></a>客户端使用</h2><p>下载地址<a href="https://tortoisesvn.net/downloads.html">在此</a></p><p>安装过程省略。</p><p>安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。</p><p>安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。</p><p><img src="./assets/img/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress" alt="img"></p><p>Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址</p><p>directory中是刚刚选择的文件夹</p><p>之后点击ok在弹窗中填入账号密码（由svn服务器管理员提供），正确后默认会拉取仓库里最新的文件</p><p>正确配置好svn服务器路径后，会在该文件夹下生成一个隐藏文件夹”.svn”，删除该文件夹就会解除关联。</p><p>配置好后右键该文件夹，右键菜单上会多出两个选项，Svn Update 和Svn Commit ，一个更新，一个提交。</p><p>Update没什么好说的，就是同步服务器上的最新代码到本地。注意在更新时，如果本地对应文件被修改过，一般不会更新。</p><p>Commit，提交本地的文件到服务器上。</p><p><img src="./assets/img/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png?x-oss-process=style/mxcompress" alt="img"></p><p>上方文本框内填写备注，备注本次提交的内容（一般都要求写）</p><p>下方文本框内显示的是本次提交的版本与服务器上版本不同的文件，提交时注意比较提交文件是否正确、是否无意中<strong>覆盖了别人代码</strong>、提交代码前注意<strong>上锁</strong>（右键项目文件夹GetLock），提交后注意<strong>解锁 ReleaseLock</strong>。</p><h2 id="代码合并"><a href="#代码合并" class="headerlink" title="代码合并"></a>代码合并</h2><p>代码合并通常使用BeyoundCompare软件进行代码合并，稳妥的做法是<strong>另开</strong>一个文件夹，对svn服务端上的项目文件夹<strong>加锁</strong>，<strong>分别复制</strong> svn服务端上的项目和本地项目，使用该软件合并代码，并在<strong>本地测试通过后</strong> commit合并后的项目文件，最后同样注意<strong>解锁</strong>。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>基于像素识别的连连看辅助</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/%E5%9F%BA%E4%BA%8E%E5%83%8F%E7%B4%A0%E8%AF%86%E5%88%AB%E7%9A%84%E8%BF%9E%E8%BF%9E%E7%9C%8B%E8%BE%85%E5%8A%A9/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/%E5%9F%BA%E4%BA%8E%E5%83%8F%E7%B4%A0%E8%AF%86%E5%88%AB%E7%9A%84%E8%BF%9E%E8%BF%9E%E7%9C%8B%E8%BE%85%E5%8A%A9/</url>
+    
+    <content type="html"><![CDATA[<p>这个算是除了课程设计之外我的第一个小工具，这里重点分析一下思路，有基础的读者应该可以通过<strong>参考</strong>本文章写出自己的程序。</p><p><em><strong>注:此文章仅用于学习参考</strong></em></p><h2 id="一、-需要的知识："><a href="#一、-需要的知识：" class="headerlink" title="一、 需要的知识："></a>一、 需要的知识：</h2><ul><li>C++基础</li><li>WinAPI的使用</li></ul><h2 id="二、-程序实现原理步骤："><a href="#二、-程序实现原理步骤：" class="headerlink" title="二、 程序实现原理步骤："></a>二、 程序实现原理步骤：</h2><ol><li>获取游戏及图片信息</li><li>分析图片及定位将其转化为矩阵(二维数组)</li><li>通过BFS算法计算消除顺序</li><li>发送对应鼠标信息进行消除。</li></ol><h2 id="三、-分步说明"><a href="#三、-分步说明" class="headerlink" title="三、 分步说明"></a>三、 分步说明</h2><h3 id="1-使用的结构体与参数说明："><a href="#1-使用的结构体与参数说明：" class="headerlink" title="1. 使用的结构体与参数说明："></a>1. 使用的结构体与参数说明：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//点坐标带方向与当前步数</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">PointDir</span><br>&#123;<br><span class="hljs-type">int</span> x;<br><span class="hljs-type">int</span> y;<br><span class="hljs-type">int</span> step;<span class="hljs-comment">//bfs中距离起点的距离</span><br><span class="hljs-type">int</span> dir;<span class="hljs-comment">//bfs中当前拓展的方向</span><br>&#125;;<br><br><span class="hljs-comment">//RGB颜色</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Color</span><br>&#123;<br>  <span class="hljs-keyword">public</span>:<br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> R; <span class="hljs-comment">//红色的亮度</span><br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> G; <span class="hljs-comment">//绿色的亮度</span><br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> B; <span class="hljs-comment">//蓝色的亮度</span><br><span class="hljs-built_in">Color</span>(); <span class="hljs-comment">//初始化参数为0</span><br><span class="hljs-built_in">Color</span>(<span class="hljs-type">int</span> r, <span class="hljs-type">int</span> g, <span class="hljs-type">int</span> b); <span class="hljs-comment">//以rgb值初始化参数</span><br><span class="hljs-type">void</span> <span class="hljs-keyword">operator</span>=(COLORREF c); <span class="hljs-comment">//以COLORREF对象赋值</span><br><span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>==(Color &amp;c);<br><span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>!=(Color &amp;c);<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">displayRGBInfo</span><span class="hljs-params">()</span></span>;<br>&#125;;<br><br><span class="hljs-comment">//一个方块</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Block</span><br>&#123;<br>  <span class="hljs-keyword">public</span>:<br>Color rect[blockSizeY][blockSizeX];<span class="hljs-comment">//一个方块内的所有像素点信息</span><br><span class="hljs-built_in">Block</span>();<span class="hljs-comment">// 初始化0</span><br><span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>==(Block &amp;b);<br>&#125;;<br><br><span class="hljs-comment">//精度值，影响截取速度（单位 像素）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> radious;<br><span class="hljs-comment">//窗口 在屏幕内 的位置（单位 像素）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> windowX;<br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> windowY;<br><span class="hljs-comment">//窗口内 到地图 的偏移量（单位 像素）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> raceX = xx + radious;<br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> raceY = xx + radious;<br><span class="hljs-comment">//地图棋盘大小（单位 行列）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> sizeX;<br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> sizeY;<br><span class="hljs-comment">//方块大小（单位 像素）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> blockSizeX = xx - radious * <span class="hljs-number">2</span>;<br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> blockSizeY = xx - +radious * <span class="hljs-number">2</span>;<br><span class="hljs-comment">//每个方块之间的间隔（单位 像素）</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> blank = xx + radious * <span class="hljs-number">2</span>;<br></code></pre></td></tr></table></figure><h3 id="2-对图像的截取："><a href="#2-对图像的截取：" class="headerlink" title="2. 对图像的截取："></a>2. 对图像的截取：</h3><ul><li>使用的主要WinAPI函数：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//以字符串匹配查找窗口</span><br><span class="hljs-function">HWND <span class="hljs-title">FindWindow</span><span class="hljs-params">(LPCSTR lpClassName, LPCSTR lpWindowName)</span></span>;<br><span class="hljs-comment">//改变窗口的大小位置以及窗口级别</span><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">SetWindowPos</span><span class="hljs-params">(HWND,HWND hWndInsertAfter,<span class="hljs-type">int</span> X,<span class="hljs-type">int</span> Y,<span class="hljs-type">int</span> cx,_In_ <span class="hljs-type">int</span> cy, UINT uFlags)</span></span>;<br><span class="hljs-comment">//获取设备句柄</span><br><span class="hljs-function">HDC <span class="hljs-title">GetDC</span><span class="hljs-params">(HWND)</span></span>;<br><span class="hljs-comment">//获取对应（x,y）坐标的像素点信息</span><br><span class="hljs-function">COLORREF <span class="hljs-title">GetPixel</span><span class="hljs-params">(HDC hdc, <span class="hljs-type">int</span> X, <span class="hljs-type">int</span> Y)</span></span>;<br><span class="hljs-comment">// 激活窗口</span><br><span class="hljs-built_in">SetForegroundWindow</span>(hwnd);<br></code></pre></td></tr></table></figure><ul><li>过程：</li></ul><p>以窗口名称查找游戏窗口得到对应句柄，激活窗口，设置窗口位置(可省，仅便于计算像素点位置)。手动计算得出牌面上每个方块的像素位置，对每个方块截取像素并保存在相应结构体数组内。</p><ul><li>代码：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//查找并设置窗口</span><br>HWND hwnd=<span class="hljs-literal">NULL</span> <span class="hljs-comment">//初始化窗口句柄</span><br>cout &lt;&lt; <span class="hljs-string">&quot;正在查找窗口 &lt;&lt;游戏窗口名称&gt;&gt;...&quot;</span> &lt;&lt; endl;<br><span class="hljs-keyword">while</span> (hwnd == <span class="hljs-literal">NULL</span>)<br>&#123;<br>hwnd = <span class="hljs-built_in">FindWindow</span>(<span class="hljs-literal">NULL</span>, <span class="hljs-built_in">TEXT</span>(<span class="hljs-string">&quot;游戏窗口名称&quot;</span>));<br>&#125;<br>cout &lt;&lt; <span class="hljs-string">&quot;窗口已找到&quot;</span> &lt;&lt; endl;<br>cout &lt;&lt; <span class="hljs-string">&quot;设置窗口位置&quot;</span> &lt;&lt; endl;<br><span class="hljs-built_in">SetWindowPos</span>(hwnd, HWND_TOP, windowX, windowY, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, SWP_NOSIZE);<span class="hljs-comment">// 设置窗口位置但不改变大小</span><br><span class="hljs-built_in">SetForegroundWindow</span>(hwnd);<span class="hljs-comment">// 激活窗口</span><br>&#125;<br><br><span class="hljs-comment">//截取并保存每个方块信息</span><br>cout &lt;&lt; <span class="hljs-string">&quot;获取方块信息...&quot;</span> &lt;&lt; endl;<br><span class="hljs-comment">//保存每个方块的rgb值</span><br>HDC hdc = <span class="hljs-built_in">GetDC</span>(hwnd);<br>Block block[sizeY][sizeX];<br><br><span class="hljs-comment">//棋盘上的每个方块</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> row = <span class="hljs-number">0</span>; row &lt; sizeY; row++)<br>&#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> col = <span class="hljs-number">0</span>; col &lt; sizeX; col++)<br>&#123;<br>cout &lt;&lt; <span class="hljs-string">&quot;正在获取block[&quot;</span> &lt;&lt; row &lt;&lt; <span class="hljs-string">&quot;][&quot;</span> &lt;&lt; col &lt;&lt; <span class="hljs-string">&quot;]方块信息...&quot;</span> &lt;&lt; endl;<br><span class="hljs-comment">//每个方块内的每个像素点</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; blockSizeY; i++)<br>&#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; blockSizeX; j++)<br>&#123;<br><span class="hljs-comment">//分别保存每个方块的每个像素点信息</span><br>block[row][col].rect[i][j] = <span class="hljs-built_in">GetPixel</span>(hdc, raceX + col * (blockSizeX + blank) + j, raceY + row * (blockSizeY + blank) + i);<br>&#125;<br>&#125;<br>&#125;<br>&#125;<br></code></pre></td></tr></table></figure><h3 id="3-将截取的图像转化为矩阵-二维数组-："><a href="#3-将截取的图像转化为矩阵-二维数组-：" class="headerlink" title="3. 将截取的图像转化为矩阵(二维数组)："></a>3. 将截取的图像转化为矩阵(二维数组)：</h3><ul><li>过程：</li></ul><p>对保存的每个方块的像素信息进行比对，相同方块(截取的像素点信息相同)使用同一个数字编号，保存在一个二维数组内</p><ul><li>代码：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Block space;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; blockSizeY; i++)<br>&#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; blockSizeX; j++)<br>&#123;<br><span class="hljs-comment">//设置空白方块的rgb值</span><br>space.rect[i][j].R = xx;<br>space.rect[i][j].G = xx;<br>space.rect[i][j].B = xx;<br>&#125;<br>&#125;<br><br><span class="hljs-type">int</span> cnt = <span class="hljs-number">1</span>;<span class="hljs-comment">//起始编号为1,0表示为空地</span><br>Block pblock[<span class="hljs-number">50</span>];<span class="hljs-comment">//临时变量，保存已经出现过的牌形种类</span><br>pblock[<span class="hljs-number">0</span>] = space;<br><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; sizeY; i++)<br>&#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; sizeX; j++)<br>&#123;<br><span class="hljs-type">bool</span> flag = <span class="hljs-literal">false</span>;<span class="hljs-comment">// 标记当前坐标方块此前是否出现过，k为该方块对应编号</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">0</span>; k &lt; cnt; k++)<br>&#123;<br><span class="hljs-comment">//越界处理提示，一般不会出现</span><br><span class="hljs-keyword">if</span> (k == <span class="hljs-number">49</span>)<br>&#123;<br>cout &lt;&lt; <span class="hljs-string">&quot;error！牌面数量太多！&quot;</span> &lt;&lt; endl;<br><span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);<br>&#125;<br><span class="hljs-keyword">if</span> (block[i][j] == pblock[k])<br>&#123;<br>map[i][j] = k;<br>flag = <span class="hljs-literal">true</span>;<br><span class="hljs-keyword">break</span>;<br>&#125;<br>&#125;<br><span class="hljs-comment">//如果此前都没有出现过该方块，给予新编号并保存当前方块</span><br><span class="hljs-keyword">if</span> (!flag)<br>&#123;<br>pblock[cnt] = block[i][j];<br>map[i][j] = cnt;<br>cnt++;<br>&#125;<br>&#125;<br>&#125;<br></code></pre></td></tr></table></figure><h3 id="4-消除路径分析："><a href="#4-消除路径分析：" class="headerlink" title="4. 消除路径分析："></a>4. 消除路径分析：</h3><ul><li>过程：</li></ul><p>算法使用BFS广度优先搜索，对每个未消除方块展开搜索，此处注意连连看限制条件（拐点不超过2个）将待消除方块信息(鼠标点击的坐标)保存在一个队列中。</p><ul><li>代码：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//该bfs仅判断单个方块是否有对应可达终点方块</span><br><span class="hljs-comment">//inX,inY为起点方块,ansX,ansY为找到的可连接的终点方块</span><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">bfs</span><span class="hljs-params">(<span class="hljs-type">int</span> inX, <span class="hljs-type">int</span> inY, <span class="hljs-type">int</span> &amp;ansX, <span class="hljs-type">int</span> &amp;ansY)</span></span><br><span class="hljs-function"></span>&#123;<br>PointDir inp, curp, nextp;<span class="hljs-comment">//起点，当前访问点，下一访问点</span><br><span class="hljs-comment">//初始化起点</span><br>inp.x = inX;<br>inp.y = inY;<br>inp.step = <span class="hljs-number">-1</span>;<span class="hljs-comment">// 由起点开始的点出发时step必定+1变为0</span><br>inp.dir = <span class="hljs-number">-1</span>;<span class="hljs-comment">// 起点不设置有效方向，便于step计数</span><br><br><span class="hljs-comment">//q保存bfs待访问队列</span><br>queue&lt;PointDir&gt; q;<br>curp = inp;<br>q.<span class="hljs-built_in">push</span>(curp);<br><span class="hljs-type">bool</span> isFind = <span class="hljs-literal">false</span>;<span class="hljs-comment">//是否找到可连接的对应方块</span><br><span class="hljs-comment">//当队列不空并且没有找到对应终点方块时继续循环</span><br><span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>() &amp;&amp; isFind == <span class="hljs-literal">false</span>)<br>&#123;<br>curp = q.<span class="hljs-built_in">front</span>();<br>q.<span class="hljs-built_in">pop</span>();<br><span class="hljs-comment">//上下左右四个方向，dirs[][]数组为四个方向的向量数组</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">0</span>; k &lt; <span class="hljs-number">4</span>; k++)<br>&#123;<br>nextp.x = curp.x + dirs[k][<span class="hljs-number">0</span>];<br>nextp.y = curp.y + dirs[k][<span class="hljs-number">1</span>];<br>nextp.dir = k;<br>nextp.step = curp.step;<br><span class="hljs-comment">//当当前访问点方向与上一点方向不相同，判定为拐点，step++</span><br><span class="hljs-keyword">if</span> (curp.dir != k)<br>&#123;<br>nextp.step++;<br>&#125;<br><span class="hljs-comment">//当拐点大于2个(不符合连连看消除条件路径)跳过当前次循环</span><br><span class="hljs-keyword">if</span> (nextp.step &gt; <span class="hljs-number">2</span>)<br>&#123;<br><span class="hljs-keyword">continue</span>;<br>&#125;<br><span class="hljs-comment">//当当前点为起点时跳过当前次循环</span><br><span class="hljs-comment">//因为连连看可消除路径数小于可到达路径数，故不判定当前点是否曾经被走过即用一个bool visited[][]保存访问状态，若有更好解决办法欢迎讨论。</span><br><span class="hljs-keyword">if</span> (nextp.x == inp.x &amp;&amp; nextp.y == inp.y)<br>&#123;<br><span class="hljs-keyword">continue</span>;<br>&#125;<br><span class="hljs-comment">//边界检查</span><br><span class="hljs-keyword">if</span> ((nextp.x &gt;= <span class="hljs-number">0</span>) &amp;&amp; (nextp.x &lt; sizeX) &amp;&amp; (nextp.y &gt;= <span class="hljs-number">0</span>) &amp;&amp; (nextp.y &lt; sizeY))<br>&#123;<br><span class="hljs-comment">//若是空地加入待访问队列</span><br><span class="hljs-keyword">if</span> (map[nextp.y][nextp.x] == <span class="hljs-number">0</span>)<br>&#123;<br>q.<span class="hljs-built_in">push</span>(nextp);<br>&#125;<br><span class="hljs-comment">//若与起点方块相同，则判定找到对应终点方块，记录坐标并退出循环</span><br><span class="hljs-keyword">if</span> (map[nextp.y][nextp.x] == map[inp.y][inp.x])<br>&#123;<br>map[inp.y][inp.x] = <span class="hljs-number">0</span>;<br>map[nextp.y][nextp.x] = <span class="hljs-number">0</span>;<br>ansX = nextp.x;<br>ansY = nextp.y;<br>isFind = <span class="hljs-literal">true</span>;<br><span class="hljs-keyword">break</span>;<br>&#125;<br>&#125;<br>&#125;<br>&#125;<br><span class="hljs-keyword">return</span> isFind;<br>&#125;<br><br><span class="hljs-comment">//计算点击顺序并保存在待点击队列qClick</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">caculate</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br><span class="hljs-comment">//一次遍历并不能把整个棋盘消除完全，经过实验一般10*20的棋盘在不考虑 无牌可消 的情况下可以在3-4次循环内消除完整。</span><br><span class="hljs-comment">//！注意此代码中的方法并不好，更好的方法应该是无限循环，当无牌可消的情况下加入重列动作，直到消除完整。</span><br><span class="hljs-comment">//将待点击队列qClick改为优先队列（以起终点距离step排序，近的优先）在连连看生成代码较完善的情况下，可以极大的减少 无牌可消 的情况。</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">0</span>; k &lt; <span class="hljs-number">5</span>; k++)<br>&#123;<br><span class="hljs-comment">//bool checkOver()函数 检查当前棋盘是否已经消除完毕</span><br><span class="hljs-keyword">if</span> (<span class="hljs-built_in">checkOver</span>())<br>&#123;<br><span class="hljs-keyword">break</span>;<br>&#125;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; sizeY; i++)<br>&#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; sizeX; j++)<br>&#123;<br><span class="hljs-comment">//对每一个点bfs展开</span><br><span class="hljs-keyword">if</span> (map[i][j] != <span class="hljs-number">0</span>) <span class="hljs-comment">//0是空地</span><br>&#123;<br>PointDir p1;<br>p1.x = j;<br>p1.y = i;<br>PointDir p2;<br><span class="hljs-keyword">if</span> (<span class="hljs-built_in">bfs</span>(j, i, p2.x, p2.y))<br>&#123;<br><span class="hljs-comment">//若找到可连接终点，将起点终点推入待点击队列</span><br>qClick.<span class="hljs-built_in">push</span>(p1);<br>qClick.<span class="hljs-built_in">push</span>(p2);<br>&#125;<br>&#125;<br>&#125;<br>&#125;<br>&#125;<br>&#125;<br></code></pre></td></tr></table></figure><h3 id="5-消除的实现："><a href="#5-消除的实现：" class="headerlink" title="5.消除的实现："></a>5.消除的实现：</h3><ul><li>主要WinAPI函数：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//设置鼠标位置</span><br><span class="hljs-function">BOOL <span class="hljs-title">SetCursorPos</span><span class="hljs-params">(<span class="hljs-type">int</span> X, <span class="hljs-type">int</span> Y)</span></span>;<br><span class="hljs-comment">//鼠标事件(模拟鼠标点击行为)</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">mouse_event</span><span class="hljs-params">(DWORD dwFlags, DWORD dx, DWORD dy, DWORD dwData, ULONG_PTR dwExtraInfo)</span></span>;<br></code></pre></td></tr></table></figure><ul><li>过程：</li></ul><p>按照待消除队列依次模拟鼠标移动点击消除便是。</p><ul><li>代码：</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">while</span> (!qClick.<span class="hljs-built_in">empty</span>())<br>&#123;<br>PointDir p;<br>p = qClick.<span class="hljs-built_in">front</span>();<br><span class="hljs-comment">//设置鼠标位置</span><br><span class="hljs-built_in">SetCursorPos</span>(windowX + raceX + p.x * (blockSizeX + blank), windowY + raceY + p.y * (blockSizeY + blank));<br><span class="hljs-comment">//模拟鼠标点击，先按下(LEFTDOWN)再放开(LEFTUP)</span><br><span class="hljs-built_in">mouse_event</span>(MOUSEEVENTF_LEFTDOWN, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br><span class="hljs-built_in">Sleep</span>(<span class="hljs-number">10</span>); <span class="hljs-comment">//要留给某些应用的反应时间</span><br><span class="hljs-built_in">mouse_event</span>(MOUSEEVENTF_LEFTUP, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br>qClick.<span class="hljs-built_in">pop</span>();<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>cpp</tag>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>C# 中的、 、.、[]、、=和as</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/C/c-%E4%B8%AD%E7%9A%84%E3%80%81-%E3%80%81-%E3%80%81-%E3%80%81%E3%80%81-%E5%92%8Cas/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/C/c-%E4%B8%AD%E7%9A%84%E3%80%81-%E3%80%81-%E3%80%81-%E3%80%81%E3%80%81-%E5%92%8Cas/</url>
+    
+    <content type="html"><![CDATA[<h2 id="可空类型"><a href="#可空类型" class="headerlink" title="(?) 可空类型"></a>(?) 可空类型</h2><p>通常来说，编程语言中一般对于数据的引用类型分为值类型和引用类型。例如bool、int等为值类型，而类一般为引用类型。值类型即存储的是数值，引用存储的是对数值地址的引用。从而引用类型可以为空（null），值类型不可为空，使用前未初始化则会出现警告或被默认初始化为该类型的默认值。</p><p>(?)符号的作用即<strong>修饰值类型</strong>，使其可空（可为null）。</p><p>举个例子：</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c#"><span class="hljs-built_in">int</span> a = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 该行报错，Vs提示：无法将null转换为“int”，因为后者是不可为null的值类型”</span><br><span class="hljs-built_in">int</span>? b = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 无报错和警告</span><br></code></pre></td></tr></table></figure><p>对应的类型：</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c#">Console.WriteLine(<span class="hljs-keyword">typeof</span>(<span class="hljs-built_in">int</span>)); <span class="hljs-comment">// System.Int32</span><br>Console.WriteLine(<span class="hljs-keyword">typeof</span>(<span class="hljs-built_in">int</span>?)); <span class="hljs-comment">// System.Nullable[System.Int32]</span><br></code></pre></td></tr></table></figure><p>可以看出来int类型即.Net类型中的System.Int32，而int?则是由Nullable类型对int的封装，使其可空，查阅<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable?view=netframework-4.8">MSDN文档</a>对Nullable的说明如下</p><blockquote><p><strong>注解</strong><br>如果可以为类型赋值或将其分配到 <code>null</code>，则称该类型为 null，这意味着该类型没有任何值。 默认情况下，所有引用类型（如 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.string?view=netframework-4.8">String</a>）都可以为 null，但所有值类型（如 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.int32?view=netframework-4.8">Int32</a>）都不是。<br>在 C# 和 Visual Basic 中，通过在值类型后使用 <code>?</code> 表示法，将值类型标记为可以为 null。 例如，在 Visual Basic 中 C# <code>int?</code> 或 <code>Integer?</code> 声明可以 <code>null</code> 分配的整数值类型。<br><a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable?view=netframework-4.8">Nullable</a> 类提供 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1?view=netframework-4.8">Nullable</a> 结构的互补支持。 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable?view=netframework-4.8">Nullable</a> 类支持获取可以为 null 的类型的基础类型，以及针对其基础值类型不支持泛型比较和相等运算的可以为 null 的类型对的比较和相等性运算。<br><strong>装箱和取消装箱</strong><br>当对可以为 null 的类型进行装箱时，公共语言运行时将自动框 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1?view=netframework-4.8">Nullable</a> 对象的基础值，而不是 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1?view=netframework-4.8">Nullable</a> 对象本身。 也就是说，如果 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1.hasvalue?view=netframework-4.8">HasValue</a> 属性为 <code>true</code>，则 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1.value?view=netframework-4.8">Value</a> 属性的内容为装箱。 如果 <code>HasValue</code> 属性为 <code>false</code>，则 <code>null</code> 为装箱。 如果可以为 null 的类型的基础值为取消装箱，则公共语言运行时将创建一个新的 <a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable-1?view=netframework-4.8">Nullable</a> 结构，该结构已初始化为基础值。</p><p><a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.nullable?view=netframework-4.8">MSDN</a></p></blockquote><h2 id="三目运算符"><a href="#三目运算符" class="headerlink" title="(?:) 三目运算符"></a>(?:) 三目运算符</h2><p>这个其实不需要怎么解释，也不是c#特有的语法，就是常用的三目运算符。</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c#"><span class="hljs-built_in">int</span> a = <span class="hljs-number">7</span>;<br><span class="hljs-built_in">bool</span> x = (a &lt; <span class="hljs-number">17</span> ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure><p>条件 ? 返回值1 : 返回值2，这是三目运算符的基本格式，问号前面也就是三目运算的条件，如果该条件为真（true）返回（返回值1），否则返回（返回值2）。和大部分编程语言相同，需要注意一个三目运算符的两个返回值的类型都必须相同，也就是返回值1和2的类型必须一致。因为在编译期就已经决定好该运算的返回值类型，如果不同，则编译时无法确定返回类型，就会报错。</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c#">Console.WriteLine(<span class="hljs-number">7</span> &lt; <span class="hljs-number">17</span> ? <span class="hljs-number">37</span> : <span class="hljs-keyword">new</span> DateTime()); <span class="hljs-comment">// 报错，提示：无法确定条件表达式的类型，因为“int”和“System.DateTime”之间没有隐式转换</span><br></code></pre></td></tr></table></figure><p>可以看到当返回值类型不同时（int和DateTime类型）将会提示这两种类型无法通过隐式的类型转换变成相同类型。<em>（DateTime类型是时间类型，这里只是为了区分WriteLine函数的参数类型和返回值间的类型）</em></p><h2 id="和-Null条件运算符"><a href="#和-Null条件运算符" class="headerlink" title="(?.)和(?[]) Null条件运算符"></a>(?.)和(?[]) Null条件运算符</h2><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c#">List&lt;<span class="hljs-built_in">int</span>&gt; list1 = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 声明空的int类型列表list1</span><br>List&lt;<span class="hljs-built_in">int</span>&gt; list2 = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">int</span>&gt;(); <span class="hljs-comment">// 声明int类型列表list2</span><br>list1.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 为list1添加一个元素 </span><br>list2.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 为list2添加一个元素 </span><br></code></pre></td></tr></table></figure><p>代码中声明两个列表对象，其中一个为null，分别调用Add()函数给列表添加元素，在Vs编译时没有报错，代码编辑器中也没有红线警告，但是当编译运行后，代码运行至list1.Add(7);时，抛出NullReferenceException空指针异常。</p><p>很容易的看出由于list1为null并且没有做null检查。改下代码</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c#">List&lt;<span class="hljs-built_in">int</span>&gt; list1 = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 声明空的int类型列表list1</span><br>List&lt;<span class="hljs-built_in">int</span>&gt; list2 = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">int</span>&gt;(); <span class="hljs-comment">// 声明int类型列表list2</span><br><span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != list1)<br>&#123;<br><span class="hljs-comment">// 如果list1 不为null 则添加一个元素 </span><br>list1.Add(<span class="hljs-number">7</span>);<br>&#125;<br>list2.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 为list2添加一个元素 </span><br></code></pre></td></tr></table></figure><p>编译运行，程序正常运行，无异常无报错。通过调试诊断工具或者肉眼调试可以知道list1依然为null并且没有执行list1.Add(7)语句，list2中成功添加值为7的元素。</p><p>相同的操作，如果使用(?.)语法则变成这样</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c#">List list1 = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 声明空的int类型列表list1</span><br>List list2 = <span class="hljs-keyword">new</span> List(); <span class="hljs-comment">// 声明int类型列表list2</span><br>list1?.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 如果list1 不为null 则添加一个元素 </span><br>list2?.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 为list2添加一个元素 </span><br></code></pre></td></tr></table></figure><p>代码执行后的结果与上一段代码相同。</p><p>?. 语法，首先判断问号前的对象是否为空，如果为空(null)则返回null并且停止执行其后的代码链，list1为null，不执行.Add()函数；如过不为null则继续执行其后的代码链，如list2.Add(7)。</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c#">List list1 = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 声明空的int类型列表list1</span><br>List list2 = <span class="hljs-keyword">new</span> List(); <span class="hljs-comment">// 声明int类型列表list2</span><br>list1?.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 如果list1 不为null 则添加一个元素 </span><br>list2?.Add(<span class="hljs-number">7</span>); <span class="hljs-comment">// 为list2添加一个元素 </span><br><span class="hljs-built_in">int</span>? a = list1?[<span class="hljs-number">0</span>]; <span class="hljs-comment">// a = null</span><br><span class="hljs-built_in">int</span>? b = list2?[<span class="hljs-number">0</span>]; <span class="hljs-comment">// b = 7</span><br></code></pre></td></tr></table></figure><p>?[]也是同样的意思，如果问号前的对象为空则返回null，否则返回对应的值。</p><h2 id="和-Null合并运算符"><a href="#和-Null合并运算符" class="headerlink" title="(??)和(??=) Null合并运算符"></a>(??)和(??=) Null合并运算符</h2><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c#">List&lt;<span class="hljs-built_in">int</span>&gt; list1 = <span class="hljs-literal">null</span>; <span class="hljs-comment">// 声明空的int类型列表list1</span><br>List&lt;<span class="hljs-built_in">int</span>&gt; list2 = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">int</span>&gt;(); <span class="hljs-comment">// 声明int类型列表list2</span><br>List&lt;<span class="hljs-built_in">int</span>&gt; list3 = list1 ?? list2; <span class="hljs-comment">// list3 = list2</span><br></code></pre></td></tr></table></figure><p>?? 运算符，若左值为null，返回右值；否则返回左值。</p><h2 id="as-类型转换"><a href="#as-类型转换" class="headerlink" title="(as) 类型转换"></a>(as) 类型转换</h2><p>as语法对类对象进行强制转换</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c#"><span class="hljs-built_in">object</span> obj = <span class="hljs-keyword">new</span> A();<br>B b = <span class="hljs-keyword">new</span> B();<br><span class="hljs-comment">// 有两个相互独立的类A和类B</span><br><br>A a1 = obj <span class="hljs-keyword">as</span> A; <span class="hljs-comment">// obj转换成功 </span><br>A a2 = b <span class="hljs-keyword">as</span> A; <span class="hljs-comment">// b转换失败，a2为null</span><br><br><span class="hljs-comment">//将obj和b两个对象转成A类对象，若转换失败，则为null，不会抛出异常，传统的类型强制转换语法，在转换失败时会抛出异常而as语法不会 </span><br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>C#</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>数据结构 – 栈</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/</url>
+    
+    <content type="html"><![CDATA[<p>栈本质上是线性表，而且是操作受限的线性表。</p><h2 id="栈的概念"><a href="#栈的概念" class="headerlink" title="栈的概念"></a>栈的概念</h2><p>栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。</p><p><img src="./assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p>把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。</p><p><img src="./assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p>如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1在栈的最底部，而最后进去的4则在栈的最上方。由于只能在栈的顶部出入，所以如果此时出栈，那么最后进去的4反而会成为出栈的元素。</p><h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里使用C++语言示范，栈中存储的数据类型为int</p><p>首先定义一个容量为maxSize的数组，这里设置为100。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> maxSize = <span class="hljs-number">100</span>;<br><span class="hljs-type">int</span> top = <span class="hljs-number">-1</span>;<br><span class="hljs-type">int</span>* stack = <span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[maxSize];<br></code></pre></td></tr></table></figure><p>top是一个int类型的值，称之为栈中的头指针或者栈顶。top永远指向当前栈中存储的数据的顶部，在初始化时，栈中是空的，所以我们将top值设为1 。可以发现，当top = -1时表示空栈，也就是栈里没有数据，当top &gt;= 0时，即表示当前栈顶的元素为stack[top]。</p><p><img src="./assets/img/747f75b76bb2b72be3e5413826fd1c3c-c86e9a-1610094817.jpeg?x-oss-process=style/mxcompress" alt="img"></p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">top++;<br>stack[top] = value;<br></code></pre></td></tr></table></figure><p>入栈时先将top加1，然后设置栈顶的值。当然，实际使用时要注意检查top指针是否越界。</p><p>取栈顶元素时也很简单</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> value = stack[top];<br></code></pre></td></tr></table></figure><p>top指向的也就是栈顶的值</p><p>出栈时，首先取到栈顶的值，再将top减1即可。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> value = stack[top];<br>top--;<br></code></pre></td></tr></table></figure><p>value即是出栈前，栈顶的元素。出栈时我们并不需要手动的再将原先的元素在数组中的数据清空，只需要简单的修改top指针指向的位置，在下一次入栈时原先的数据将会被直接覆盖。同样的道理，清空整个栈也只需要将top设为-1就可以了。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">top = <span class="hljs-number">-1</span>; <span class="hljs-comment">// 清空栈</span><br></code></pre></td></tr></table></figure><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>栈是程序设计中非常常用的一个数据结构，虽然本质上是线性表，但是限制操作后就可以看成是一种具有后进先出特性的线性表，看似有限的操作空间，但是在使用上却更为简遍。其实这就是一种封装，将数组或者链表封装成栈之后，不需要使用者去人为的管理维护这个数组或者是链表，只需要简单的调用push()/pop()，使代码更简洁，也减少了出错的可能性。</p><h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>在细节上有一些小问题，所以仅供参考。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//顺序栈</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ArrayStack</span> &#123;<br>   <span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// 栈顶指针</span><br>    <span class="hljs-type">int</span> top;<br>    <span class="hljs-comment">// 栈的最大容量</span><br>    <span class="hljs-type">int</span> maxSize;<br>    <span class="hljs-comment">// 数据指针</span><br>    Type* date;<br><br>   <span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// 构造函数，默认创建大小为100的顺序栈</span><br>    <span class="hljs-built_in">ArrayStack</span>();<br>    <span class="hljs-comment">// 构造函数，创建大小为max的顺序栈</span><br>    <span class="hljs-built_in">ArrayStack</span>(<span class="hljs-type">int</span> max);<br>    <span class="hljs-comment">// 析构函数，释放空间</span><br>    ~<span class="hljs-built_in">ArrayStack</span>();<br>    <span class="hljs-comment">// 入栈，成功返回true，失败返回false</span><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">push</span><span class="hljs-params">(Type d)</span></span>;<br>    <span class="hljs-comment">// 出栈，返回出栈前栈顶的元素</span><br>    <span class="hljs-function">Type <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 获取栈顶元素</span><br>    <span class="hljs-function">Type <span class="hljs-title">getTop</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 获取当前栈的空间</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">getSize</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 判断空栈</span><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isEmpty</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 清空栈中的元素</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setEmpty</span><span class="hljs-params">()</span></span>;<br>&#125;;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br>ArrayStack&lt;Type&gt;::<span class="hljs-built_in">ArrayStack</span>() &#123;<br>    top = <span class="hljs-number">-1</span>;<br>    maxSize = <span class="hljs-number">100</span>;<br>    date = <span class="hljs-keyword">new</span> Type[maxSize];<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br>ArrayStack&lt;Type&gt;::<span class="hljs-built_in">ArrayStack</span>(<span class="hljs-type">int</span> max) &#123;<br>    top = <span class="hljs-number">-1</span>;<br>    maxSize = max;<br>    date = <span class="hljs-keyword">new</span> Type[maxSize];<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br>ArrayStack&lt;Type&gt;::~<span class="hljs-built_in">ArrayStack</span>() &#123;<br>    top = <span class="hljs-number">-1</span>;<br>    <span class="hljs-keyword">delete</span> date;<br>    date = <span class="hljs-literal">nullptr</span>;<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br><span class="hljs-type">bool</span> ArrayStack&lt;Type&gt;::<span class="hljs-built_in">push</span>(Type d) &#123;<br>    <span class="hljs-keyword">if</span> (top + <span class="hljs-number">1</span> == maxSize) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    top++;<br>    date[top] = d;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br>Type ArrayStack&lt;Type&gt;::<span class="hljs-built_in">pop</span>() &#123;<br>    <span class="hljs-keyword">if</span> (top == <span class="hljs-number">-1</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    Type temp = date[top];<br>    top--;<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br>Type ArrayStack&lt;Type&gt;::<span class="hljs-built_in">getTop</span>() &#123;<br>    <span class="hljs-keyword">if</span> (top == <span class="hljs-number">-1</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    Type temp = date[top];<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><span class="hljs-comment">//返回当前长度 top+1</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br><span class="hljs-type">int</span> ArrayStack&lt;Type&gt;::<span class="hljs-built_in">getSize</span>() &#123;<br>    <span class="hljs-keyword">return</span> top + <span class="hljs-number">1</span>;<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br><span class="hljs-type">bool</span> ArrayStack&lt;Type&gt;::<span class="hljs-built_in">isEmpty</span>() &#123;<br>    <span class="hljs-keyword">return</span> (top == <span class="hljs-number">-1</span> ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>);<br>&#125;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span>&gt;<br><span class="hljs-type">void</span> ArrayStack&lt;Type&gt;::<span class="hljs-built_in">setEmpty</span>() &#123;<br>    top = <span class="hljs-number">-1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>数据结构-算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>cpp</tag>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>数据结构</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SQL查询表中是否存在符合条件的记录</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%9F%A5%E8%AF%A2%E8%A1%A8%E4%B8%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E7%AC%A6%E5%90%88%E6%9D%A1%E4%BB%B6%E7%9A%84%E8%AE%B0%E5%BD%95/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%9F%A5%E8%AF%A2%E8%A1%A8%E4%B8%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E7%AC%A6%E5%90%88%E6%9D%A1%E4%BB%B6%E7%9A%84%E8%AE%B0%E5%BD%95/</url>
+    
+    <content type="html"><![CDATA[<p>判断记录是否存在，最主要的问题就是性能问题</p><p>话不多说，直接上结果</p><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs n1ql">-- 存在返回 1, 不存在返回 0<br><span class="hljs-keyword">select</span> <span class="hljs-built_in">ifnull</span>((<span class="hljs-keyword">select</span> <span class="hljs-number">1</span> <span class="hljs-keyword">from</span> tableName <span class="hljs-keyword">where</span> conditions <span class="hljs-keyword">limit</span> <span class="hljs-number">1</span> ), <span class="hljs-number">0</span>)﻿ <span class="hljs-keyword">as</span> existed<br></code></pre></td></tr></table></figure><p>ifnull 函数：如果第一个参数值为null，返回第二个参数的值，如果不为 null 则返回第一个参数的值</p><p>错误示范：</p><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">select</span> <span class="hljs-built_in">COUNT</span>(*) <span class="hljs-keyword">from</span> tableName <span class="hljs-keyword">where</span> conditions<br></code></pre></td></tr></table></figure><p>根据结果的数量进行比较，简单易懂。但是count(*)统计全表数量，性能开销较大</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>Sql</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>Sql</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Mysql-双机热备</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/</url>
+    
+    <content type="html"><![CDATA[<p>首先建立两个mysql环境。该文章中数据库环境为Centos7, mysql5.7.28，均为虚拟机，在主机上使用Navicat通过局域网连接两个数据库进行测试。</p><p>由于复制功能基于二进制日志，所以在开启复制之前，应保证两个数据库中都有相同的库结构及数据，否则容易引起复制语句异常。Mysql的版本最好保持一致避免可能的异常。</p><h2 id="基本的条件："><a href="#基本的条件：" class="headerlink" title="基本的条件："></a>基本的条件：</h2><ul><li>主从数据库连接正常，能正常Ping通。</li><li>端口正确开放</li><li>防火墙等的配置（避免在读取二进制日志时出现问题）</li></ul><p><img src="./assets/img/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p><img src="./assets/img/33e2a5a631164c121e05e5fb3b922534-0ef7b2-1610094861.jpeg?x-oss-process=style/mxcompress" alt="img"></p><h2 id="修改数据库配置文件-etc-my-cnf"><a href="#修改数据库配置文件-etc-my-cnf" class="headerlink" title="修改数据库配置文件 /etc/my.cnf"></a>修改数据库配置文件 /etc/my.cnf</h2><p>在<strong>数据库A</strong>的[mysqld]部分添加或修改以下内容：</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">server_id=<span class="hljs-number">1</span> <span class="hljs-regexp">//</span>数据库A 的唯一标识，必须唯一<br>log-bin=master_01 <span class="hljs-regexp">//</span>开启二进制日志，数据库同步的基础<br>binlog-<span class="hljs-keyword">do</span>-db=test_A <span class="hljs-regexp">//</span> 需要同步的库，两边的库名字要一样并且一行只能写一个库<br></code></pre></td></tr></table></figure><p>在<strong>数据库B</strong>的[mysqld]部分添加或修改以下内容：</p><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">server_id</span>=<span class="hljs-number">2</span><br><span class="hljs-attr">log-bin</span>=master_02<br><span class="hljs-attr">binlog-do-db</span>=test_A<br></code></pre></td></tr></table></figure><p>若需要同步多个库需要将binlog-do-db分为多行写，如下</p><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_A<br><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_B<br><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_C<br></code></pre></td></tr></table></figure><p>要注意 “binlog-do-db=test_A, test_B, test_C” 这种写法是<strong>错误</strong>的，会将ABC认为是同一个库, 并且在后续操作中不会出现异常报错</p><p>修改完成后<strong>重启数据库</strong>使修改生效</p><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">systemctl <span class="hljs-built_in">restart</span> mysqld.service<br></code></pre></td></tr></table></figure><h2 id="配置主从复制功能"><a href="#配置主从复制功能" class="headerlink" title="配置主从复制功能"></a>配置主从复制功能</h2><p>进入mysql控制台，查看当前<strong>数据库A</strong>的状态，并且记录File和Position值</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">show <span class="hljs-keyword">master</span> <span class="hljs-title">status</span>;<br></code></pre></td></tr></table></figure><p><img src="./assets/img/efc3cc448668a197371dc3b9b2bf0a39-87e9c4-1610094876.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p>如图，记录的File值为master_01.000001，Position值为2653</p><p><em>注意，在运行show master status命令前，应保证该数据库无任何</em>***写操作***<em>，应停止服务或者加入 FLUSH TABLES WITH READ LOCK 锁。同时可在此时对数据库进行备份，并且将数据保存到另一个数据库中（表结构及数据等）以保证数据一致性并且防止后续操作出现异常。</em></p><p>记录好值以后可以开放数据库A</p><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf">UNLOCK TABLES<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure><p>来到<strong>数据库B</strong> 中，关闭复制功能</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">stop</span> <span class="hljs-literal">slave</span>;<br></code></pre></td></tr></table></figure><p>配置复制功能，修改下列代码中为对应的值，并执行</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">CHANGE MASTER <span class="hljs-keyword">TO</span><br><span class="hljs-attribute">MASTER_HOST</span>=<span class="hljs-string">&#x27;数据库A的ip地址&#x27;</span>,<br><span class="hljs-attribute">MASTER_USER</span>=<span class="hljs-string">&#x27;数据库A提供的用于复制的用户&#x27;</span>,<br><span class="hljs-attribute">MASTER_PASSWORD</span>=<span class="hljs-string">&#x27;密码&#x27;</span>,<br><span class="hljs-attribute">MASTER_PORT</span>=3306,<br><span class="hljs-attribute">MASTER_LOG_FILE</span>=<span class="hljs-string">&#x27;刚记录的数据库A的File文件名&#x27;</span>,<br><span class="hljs-attribute">MASTER_LOG_POS</span>=刚记录的数据库A的Position值,<br><span class="hljs-attribute">MASTER_CONNECT_RETRY</span>=数据库A的server_id;<br></code></pre></td></tr></table></figure><p>开启复制功能</p><p>start slave;</p><p>同样的，对数据库B也是同样的操作，<br>记录<strong>数据库B</strong> 的状态值</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">show <span class="hljs-keyword">master</span> <span class="hljs-title">status</span>; <br></code></pre></td></tr></table></figure><p>然后在<strong>数据库A</strong> 中</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">stop</span> <span class="hljs-literal">slave</span>; <br></code></pre></td></tr></table></figure><p>执行代码（将上文代码中数据库A的值换为数据库B的）</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">CHANGE MASTER <span class="hljs-keyword">TO</span><br><span class="hljs-attribute">MASTER_HOST</span>=<span class="hljs-string">&#x27;数据库B的ip地址&#x27;</span>,<br><span class="hljs-attribute">MASTER_USER</span>=<span class="hljs-string">&#x27;数据库B提供的用于复制的用户&#x27;</span>,<br><span class="hljs-attribute">MASTER_PASSWORD</span>=<span class="hljs-string">&#x27;密码&#x27;</span>,<br><span class="hljs-attribute">MASTER_PORT</span>=3306,<br><span class="hljs-attribute">MASTER_LOG_FILE</span>=<span class="hljs-string">&#x27;刚记录的数据库B的File文件名&#x27;</span>,<br><span class="hljs-attribute">MASTER_LOG_POS</span>=刚记录的数据库B的Position值,<br><span class="hljs-attribute">MASTER_CONNECT_RETRY</span>=数据库B的server_id;<br></code></pre></td></tr></table></figure><p>开启复制功能</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">start</span> <span class="hljs-literal">slave</span>;<br></code></pre></td></tr></table></figure><p>配置完两个数据库后执行</p><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima"><span class="hljs-built_in">show</span> slave <span class="hljs-built_in">status</span>\G;<br></code></pre></td></tr></table></figure><p>查看配置情况，若无发现Error报错信息，则正常启动，可以通过Navicat等可视化软件对配置的库进行测试。若一切正常，在AB数据库中的操作均可正常复制到另一个数据库中。</p><h2 id="可能的问题"><a href="#可能的问题" class="headerlink" title="可能的问题"></a>可能的问题</h2><p>same uuid：我在配置过程中发现这个问题，原因是因为在配置虚拟机环境时是配置好一个虚拟机的mysql环境后直接使用VMware的克隆功能，导致两个数据库的uuid相同。解决方法：删除任意一个数据库的auto.conf文件（在my.cnf文件中datadir对应的路径下，一般是/var/lib/mysql/ ）删除后重启该数据库，会重新生成该文件。</p><p>Slave_IO_Running: NO ：表示在拉取二进制日志时出现异常，通常是由防火墙导致</p><p>Slave_IO_Running: Connecting ：连接错误或者配置错误，检查数据库ip地址及端口，检查配置的ip地址是否错误，防火墙拦截等。</p><h2 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h2><p><a href="https://blog.51cto.com/13577495/2167525">https://blog.51cto.com/13577495/2167525</a></p><p><a href="https://www.mysqlzh.com/doc/55.html">https://www.mysqlzh.com/doc/55.html</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>Sql</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>Web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>好用的软件收集</title>
+    <link href="/uncategorized/%E5%A5%BD%E7%94%A8%E7%9A%84%E8%BD%AF%E4%BB%B6%E6%94%B6%E9%9B%86/"/>
+    <url>/uncategorized/%E5%A5%BD%E7%94%A8%E7%9A%84%E8%BD%AF%E4%BB%B6%E6%94%B6%E9%9B%86/</url>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>平时用到的软件很多，又杂，所以就整篇文章罗列出我自己平时用到的软件，由于本人的兴趣广泛，包括但不限于编程、作图、修图、摄影、写作、游戏、优化、美化等类型，或许也会包含一些有趣的我也不知道用来干什么的小程序或网站等。<em>同时也作为重装系统之后的软件安装列表。</em></p><p><em>本文章非广告，仅为个人推荐</em></p><h5 id="服务器篇"><a href="#服务器篇" class="headerlink" title="服务器篇"></a>服务器篇</h5><ol><li>WordPress<ul><li>本博客就是由WordPress驱动的，总的来说就是一个自动建立网站的开源软件。WordPress相当于是个博客管理系统，可以自定义主题，本博客主题为<a href="https://c7sky.com/">小影志</a>的<a href="https://c7sky.com/wordpress-theme-c7v5.html">C7V5</a>。</li></ul></li></ol><h5 id="代码相关"><a href="#代码相关" class="headerlink" title="代码相关"></a>代码相关</h5><ol><li>VsCode<ul><li>微软自家的文本编辑器，不是IDE的IDE。通过不同的插件可实现IDE的功能，各种语言或者文章的编写，用过的都懂。</li></ul></li><li>IDEA<ul><li>比较Eclipse来说，IDEA在对技术的支持上更方便一些<del>（启动速度贼慢）</del>，Ultimate版本集成了Spring等web项目，比起eclipse复杂的配置要便利许多。（而且好看）</li></ul></li><li>GitHubDesktop<ul><li>github的桌面版，傻瓜版的git，只要点点点就可以完成代码提交等基本功能。</li></ul></li><li>PowerDesigner<ul><li>强大好用的数据库设计工具。</li></ul></li><li>Navicat<ul><li>可视化DBMS。</li></ul></li><li>Beyound Compare<ul><li>代码合并工具</li></ul></li><li>Xshell<ul><li>ssh连接服务器工具</li></ul></li><li></li></ol><h5 id="日常使用"><a href="#日常使用" class="headerlink" title="日常使用"></a>日常使用</h5><ol><li>向日葵<ul><li>远程控制自己的电脑，个人感觉比<a href="https://www.teamviewer.cn/cn/">TeamView</a>好使。</li></ul></li><li>EveryThing<ul><li>本地文件搜索工具，比系统自带的搜索快多了。</li></ul></li><li>Adobe全家桶<ul><li>这还用解释？</li></ul></li><li>小丸工具箱<ul><li>视频剪辑处理的小工具。</li></ul></li><li>FastStone Capture<ul><li>截图工具，长图、滚动、短视频录制等。</li></ul></li><li>Office全家桶<ul><li>不用解释了吧？</li></ul></li><li>SpaceSniffer<ul><li>磁盘空间分析软件，免费。可视化的界面展示各个文件/文件夹占用的大小。</li></ul></li></ol>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>记一次离奇的网络瘫痪</title>
+    <link href="/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/"/>
+    <url>/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/</url>
+    
+    <content type="html"><![CDATA[<p>今天下午，当我正在coding的时候，一上百度发现网络断开，紧接着qq下线、steam登出…刹时间我意识到，网络崩了。没过多久，系统（win10）右下角的网络显示网络无连接，尝试在“网络与Internet设置”中关闭有线连接适配器。</p><p><img src="./assets/img/0bf5b4b02e59c95b0b37017eee894f00-ce4604-1610094903.png?x-oss-process=style/mxcompress" alt="img"></p><p>万万没想到，当我禁用之后再次启用的时候居然无法启动，于是重启系统，结果又卡在了“正在重启”的界面，过了一会感觉像是卡住了就关机键长按关机再开机。开机的时候刷了一下手机，结果发现连着家庭wifi的手机正常上网？？？开机之后，尝试打开一个网页，居然成功了？？？</p><p>正当我以为网络正常的时候，打开了一个新网页，又出现了刚才的情况——没网了。于是输入192.168.3.1(这是我家主路由的ip地址），结果发现有线连接的路由器居然都连不上了，同时使用手机登录该地址查看路由设置，正常，检查了一下路由连接的终端设备，无线连接设备一切正常，有线连接一个都没有…这时我感觉到，事情并没有这么简单…</p><h5 id="网络情况介绍"><a href="#网络情况介绍" class="headerlink" title="网络情况介绍"></a>网络情况介绍</h5><p><img src="./assets/img/039c7638b4cb69ebe053494d43248011-ef9a80-1610094927.png?x-oss-process=style/mxcompress" alt="img">拓扑结构</p><p>上图是家里的网络拓扑结构图，入户光猫为网络入口，ip地址为192.168.1.1并且隐藏ssid，不作为日常使用。主路由为家中的主要路由设备，放置在书房作为主要的wifi广播信号，ip地址为192.168.3.1，有线设备全部通过交换机连接。由于额外一间房间由于户型结构的问题与主路由距离较远且中间有墙隔挡，wifi信号极差，正好家中有一台闲置的旧路由，就作为中继路由拓展主路由的无线信号（关闭DHCP、SSID和密码与主路由设置相同），并且因为这个是放在非主要房间的某个角落，所以我自己都忘了还有这个设备（这是前提）</p><h5 id="排查问题"><a href="#排查问题" class="headerlink" title="排查问题"></a>排查问题</h5><p>开始排查问题，首先主机尝试登录192.168.3.1与192.168.1.1，均无法连接并且ping不通。之后尝试手机登录，均正常连接，查看终端设备发现没有有线设备。查看交换机，交换机上所有连接设备信号灯都在，并且闪烁，尝试拔出线缆，主机识别网线拔出，但是再插入时依然显示无网络连接。结合今日高温天气并且没有开空调，认为是网络设备高温宕机了，于是关闭所有路由和交换机（不包括中继路由）。几分钟后，设备温度恢复常温后再次开机，此时网络恢复，有线无线均正常，但是过了一会再次出现了以上的情况。此时发现无线连接的设备虽然可以上网但是一会可以一会不行，而有线连接是持续无法上网。</p><p>开始怀疑为设备故障的问题，尝试断开交换机，将主机连至主路由上，此时主机提示发现新网络并且网络正常。此时怀疑为交换机宕机。再次连接交换机，经过一段时间，再次出现网络无法连接。之后使用排除法，拔出所有交换机连接，仅保留与主路由连接线，每次插入一条网线进行排除测试。</p><p>最后，发现已经有一条线路连接上后，网络就出现瘫痪。随后检查该线路发现了已经被我遗忘的中继路由。尝试断开该中继路由发现网络恢复正常…至此，终于发现罪魁祸首。</p><h5 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h5><p>可是为什么正常使用了一年时间才突然出现这个问题呢？推测如下：检查中继路由上的标签发现这个路由是2011年购买并且此前在老家作为主路由服役了较长时间，又由于高温导致该路由器故障异常，可是为什么子路由故障会导致整个网段瘫痪呢？结合交换机上的信号灯在所有设备均没有发起网络请求的情况下剧烈闪烁，推测由于设备故障引起了广播风暴导致网络发生阻塞…</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>Web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SpringBoot Web项目开发(一) 环境搭建</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%B8%80-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%B8%80-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+    
+    <content type="html"><![CDATA[<h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><blockquote><p>Spring Boot 是由 Pivotal 团队提供的全新框架，其设计目的是用来简化新 Spring 应用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再需要定义样板化的配置。通过这种方式，Spring Boot 致力于在蓬勃发展的快速应用开发领域 (rapid application development) 成为领导者。<br>从最根本上来讲，Spring Boot 就是一些库的集合，它能够被任意项目的构建系统所使用。</p><p>百度百科</p></blockquote><h3 id="二、环境准备"><a href="#二、环境准备" class="headerlink" title="二、环境准备"></a>二、环境准备</h3><p>本文以SpringBoot+Maven+Mybatis+MySQL为例，IDE使用IDEA。</p><p>IDEA版本注意为<a href="https://www.jetbrains.com/idea/download/#section=windows">Ultimate</a> (Ultimate与Community版相比，集成了更多面向于WEB相关的工具)<br>JAVA版本为1.8<br>MySQL版本为5.7.25<br>Maven使用IDEA自带:<br>配置阿里镜像源:打开IDEA，File-&gt;settings</p><p><img src="./assets/img/image-6f86f7b3534efc8beea3605a38cbbf89-603c10-1610093064.png?x-oss-process=style/mxcompress" alt="settings Maven配置界面"></p><p>Build-&gt;Build Tools-&gt;Maven 中User settings file可以查看当前maven的配置项，打开路径对应文件。</p><p><img src="./assets/img/code-1024x962-9fd180e94b6f4c39f337826276a85612-f13f0b-1610093081.png?x-oss-process=style/mxcompress" alt="img"></p><p>找到xml文件中mirrors标签，添加以下代码</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!-- 阿里云仓库 --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">mirror</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>alimaven<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">mirrorOf</span>&gt;</span>central<span class="hljs-tag">&lt;/<span class="hljs-name">mirrorOf</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>aliyun maven<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">url</span>&gt;</span>http://maven.aliyun.com/nexus/content/repositories/central/<span class="hljs-tag">&lt;/<span class="hljs-name">url</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">mirror</span>&gt;</span><br></code></pre></td></tr></table></figure><p>以上操作配置Maven镜像源为阿里国内源，加快速度。</p><h3 id="三、创建项目"><a href="#三、创建项目" class="headerlink" title="三、创建项目"></a>三、创建项目</h3><p>IDEA -&gt; File -&gt; new project -&gt; Spring Initializr</p><p><img src="./assets/img/image-2-c01e335af8aa7df297d410e301476c8e-6bfc6e-1610093103.png?x-oss-process=style/mxcompress" alt="img"></p><p><img src="./assets/img/image-3-a14b40a6b746c315bd60a322a18f30d8-e798c4-1610093115.png?x-oss-process=style/mxcompress" alt="img"></p><p>接下来选择项目依赖，具体依赖根据项目需求选择，后期也可以在pom.xml中修改</p><p><img src="./assets/img/image-4-bb52f36d371102cd655b6af50120313b-ec34aa-1610093175.png?x-oss-process=style/mxcompress" alt="img"></p><p>main中为项目源代码，MarketApplication.java为项目启动入口；<br>resources为静态资源目录，application.properties为项目的配置文件，配置文件还有 application.yml 的yml类型。<br>test中为项目测试代码，该部分主要为项目测试代码。<br>pom.xml文件为Maven项目的依赖配置文件。</p><h3 id="四、添加相关依赖"><a href="#四、添加相关依赖" class="headerlink" title="四、添加相关依赖"></a>四、添加相关依赖</h3><p>打开pom.xml文件，<br>下方找到dependencies段，添加mybatis与mysql依赖</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!--mybatis--&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mybatis.spring.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mybatis-spring-boot-starter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><br><span class="hljs-comment">&lt;!--mysql--&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>mysql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mysql-connector-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.1.39<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure><p>至此完成SpringBoot Web项目集成Mybatis的配置。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>SpringBoot</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>Web</tag>
+      
+      <tag>Spring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>数据结构-链表</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E9%93%BE%E8%A1%A8/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E9%93%BE%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[<p>链表是线性表的一种，是一种基础的数据结构，相对于数组更加的灵活。本文以<strong>单链表</strong>为例、用 <strong>C++</strong> 语言描述介绍链表的原理与实现。</p><h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><p>在讨论链表之前，先来看一下另一种线性表——数组。数组是储存在一块连续分配的内存中的，通过对元素下标、元素类型和数组首地址的运算，我们可以很方便的得到元素在内存中的地址。以一维数组为例，数组中的每个元素都是按照顺序依次储存在一块连续分配的内存中。</p><p><img src="./assets/img/Memory.jpg?x-oss-process=style/mxcompress" alt="数组在内存中的分配"></p><p>数组由于是分配在连续的内存空间上，在随机读取方面具有极大的优势，但是在程序中数组的大小是固定的，一旦定义了一个数组，就不能对其大小进行调整。所以我们在设定时往往以最大的需求来定义数组，而有些时候这会造成一些空间上的浪费。</p><h2 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h2><p>链表是一种灵活的数据结构，在内存上是不连续的。</p><h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p>链表中的每个元素称为节点Node。节点在内存中是随机分布的，每个节点分为两个部分，存放数据的数据域和保存地址的指针域。</p><p><img src="./assets/img/Node-cf7df3e42588b5b990f72608ca0fd257-cd4fc8-1610089027.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p>单链表由一个头节点Node *head（指向第一个节点的地址）和各节点组成，从头节点开始，通过指针将每个节点依次连接起来，最后一个指针置空（指向nullptr）。</p><p><img src="./assets/img/delete-d9814b52ffbb9a97cf928c54c7395c43-ca62e2-1610089087.jpeg?x-oss-process=style/mxcompress" alt="img"></p><p>在单链表中，每个节点除了本身的数据之外保存的还有下一个节点的地址，对链表的访问也只能从头节点出发，直到找到目标。节点的储存是分散的，只是通过指针将每个节点串了起来，形成一个完整的链，从而提高了数据储存的灵活性。缺点则是当要访问某一元素的时候，必须从头开始遍历，时间复杂度为O(n)。</p><h3 id="节点的插入与删除"><a href="#节点的插入与删除" class="headerlink" title="节点的插入与删除"></a>节点的插入与删除</h3><p>链表中每个节点通过指针连接，因此，插入与删除节点的时候只要修改对应指针的指向。</p><p><img src="./assets/img/Insert.jpg?x-oss-process=style/mxcompress" alt="Insert"></p><p>插入节点时，首先将要插入的野生节点的指针指向要插入的后一个节点（图中节点2），再将前一个节点的指针指向野生节点。</p><p><img src="./assets/img/delete.jpg?x-oss-process=style/mxcompress" alt="delete"></p><p>删除节点与插入类似，只要将前一节点（head）的指针指向被删除后一节点（节点2），同时别忘了将节点1的内存空间回收。</p><h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><p>单链表是链表中最简单的一个类型，链表还有双链表、循环链表。</p><p><img src="./assets/img/doubleNode.jpg?x-oss-process=style/mxcompress" alt="doubleNode"></p><p>双链表是在单链表的基础上，在节点的指针域中增加一个指针*prevNode(previous node)指向前一个节点，实现对链表的双向访问。</p><p><img src="./assets/img/cycleList.jpg?x-oss-process=style/mxcompress" alt="cycleList"></p><p>循环链表是在单/双链表的基础上，将尾节点的*nextNode指针指向头节点，使链表形成一个环状结构。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>数据结构-算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>代码</tag>
+      
+      <tag>数据结构</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SpringBoot Web 项目开发 (二) 工程结构</title>
+    <link href="/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/"/>
+    <url>/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/</url>
+    
+    <content type="html"><![CDATA[<p>上一篇文章中，我们已经搭建好了springboot web项目的基本架构，但是web开发当然只有这些是不够的，而一个项目当然也需要一个比较好的结构划分，</p><p><img src="./assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress" alt="img"></p><ul><li>main 主要的源代码区<ul><li>java 具体的代码层<ul><li>config 配置，springboot的一些配置类可以放在这里，例如swagger的配置类等</li><li>error 异常处理，自定义的异常处理类等</li><li>interceptor 拦截器</li><li>utils 工具类，放置项目中通用的工具</li><li>validator 通用的校验工具</li><li>controller 控制器，在微服务架构中主要是api的定义、参数的校验以及调用service服务层进行业务处理</li><li>service 业务层，主要的业务逻辑都在这里，数据库dao层的调用、复杂数据的生成处理、密码的加密解密、文件处理等</li><li>dao 持久化层，数据库处理层，只有该层可以控制数据库</li></ul></li><li>resources 资源层<ul><li>mapping 示例项目中是存放mybatis-generater生成的mapping文件</li><li>static 静态资源</li><li>templates 模板页面，如thymeleaf等编写的模板页面</li><li>application.properties springboot的配置文件</li><li>mybatis-generator.xml mybatis-generator插件的配置文件</li></ul></li></ul></li><li>test 测试层，测试代码</li><li>pom.xml Maven项目依赖管理的配置文件</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>程序</category>
+      
+      <category>SpringBoot</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>程序</tag>
+      
+      <tag>Web</tag>
+      
+      <tag>Spring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>为什么要写博客</title>
+    <link href="/%E9%97%B2%E8%81%8A/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
+    <url>/%E9%97%B2%E8%81%8A/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%86%99%E5%8D%9A%E5%AE%A2/</url>
+    
+    <content type="html"><![CDATA[<h1 id="为什么要写博客？"><a href="#为什么要写博客？" class="headerlink" title="为什么要写博客？"></a>为什么要写博客？</h1><p>为什么写博客，原因嘛，那是一开始看见别人有自己名字的网站，觉得有个自己的网站很酷，想着自己怎么也是计算机的捣鼓个玩玩，各种忙活之后就有了这儿。</p><p><strong>写博客是个注重坚持的行为，这是一个锻炼自己的方式。</strong></p><p>首先，我个人认为博客是写给自己的，其次，才是写给别人看的。具体的原因嘛，往下看呗~</p><ul><li><strong>强化知识。</strong></li></ul><ul><li><strong>“如果你不能把一件事情讲清楚，那么十有八九你并没有完全理解它”</strong></li></ul><p>博客是对自己知识的学习和再整理，单单是读书，可能读完就忘了，但是读完书之后，将自己的理解经过大脑的思考和再创造之后以博文的形式再发布出来，这明显可以提高对这部分知识的理解。</p><ul><li><strong>提高语言的组织能力。</strong>博客，不论是写给自己还是写给别人看的，最重要的一点就是 你要让人看懂。写博客难的不是去讨论这个什么技术，而是怎样写的通俗易懂。</li><li><strong>形成自己的知识体系。</strong>人这一辈子啊，毕竟不能只苟在某个小圈子里不是，总得要学许多不同的东西，以我自己来说，你以后会在这发现许多不同的东西（当然前提是我不偷懒）包括但不限于编程，语言，摄影作品等等等等等。</li><li><strong>很好的刺激自己学习的理由。</strong>要写博客嘛，自己都不会的话怎么能有产出呢？要有干货那就要先把它学完呗。（当然不要像我一样偷懒）</li><li>还有别的，容我想到了再说。</li></ul><p>其实吧，博客这种东西，特别是独立博客，更多的就是记录自己的成长，更好地了解自己成长过程中收获的经验。</p><p>然而建博好久了，还是没写几篇…</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>闲聊</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  
+</search>

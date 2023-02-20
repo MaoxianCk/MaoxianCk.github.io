@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="MaoxianCk">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言首先明确，这里主要论述的Session并不是指具体的各个语言的实现，而是单指Session（会话）的技术。 定义标准HTTP协议请求本身是无状态的，也就是说，用户A和B同时向服务器发送了一个请求，服务器是无法判断这两个请求分别是来自于A还是B还是C。 为了实现有状态的HTTP请求，即在业务上服务端需要知道每一个请求分别来自于谁，就需要在HTTP的基础上，在应用业务上实现这么一个功能来维持用户的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机中的会话(Session)">
+<meta property="og:url" content="http://example.com/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%AD%E7%9A%84%E4%BC%9A%E8%AF%9D-session/index.html">
+<meta property="og:site_name" content="毛线球上的喵星人">
+<meta property="og:description" content="前言首先明确，这里主要论述的Session并不是指具体的各个语言的实现，而是单指Session（会话）的技术。 定义标准HTTP协议请求本身是无状态的，也就是说，用户A和B同时向服务器发送了一个请求，服务器是无法判断这两个请求分别是来自于A还是B还是C。 为了实现有状态的HTTP请求，即在业务上服务端需要知道每一个请求分别来自于谁，就需要在HTTP的基础上，在应用业务上实现这么一个功能来维持用户的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-05T03:22:03.783Z">
+<meta property="article:modified_time" content="2022-05-05T03:22:03.783Z">
+<meta property="article:author" content="MaoxianCk">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="Session">
+<meta property="article:tag" content="Cookie">
+<meta property="article:tag" content="信息安全">
+<meta property="article:tag" content="认证">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>计算机中的会话(Session) - 毛线球上的喵星人</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>毛线球上的喵星人</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/asset/images/default-bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机中的会话(Session)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-05-05 03:22" pubdate>
+          2022年5月5日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">计算机中的会话(Session)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>首先明确，这里主要论述的Session并不是指具体的各个语言的实现，而是单指Session（会话）的技术。</p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>标准HTTP协议请求本身是无状态的，也就是说，用户A和B同时向服务器发送了一个请求，服务器是无法判断这两个请求分别是来自于A还是B还是C。</p>
+<p>为了实现有状态的HTTP请求，即在业务上服务端需要知道每一个请求分别来自于谁，就需要在HTTP的基础上，在应用业务上实现这么一个功能来维持用户的状态，从而将登录、和后续用户操作等等多个独立的HTTP请求联系起来，这就是Session。</p>
+<p>换个说法，将客户端和服务端之间的多个独立HTTP请求起来关联，并识别请求的用户身份，能够实现这样一种功能的，就是Session（会话）</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>那么，Session的实现方案有哪些？Token、JWT、PHP Session和Tomcat Session等等都是什么鬼？</p>
+<p>一个个来说这些东西，但是先说一下Cookie。</p>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p>cookie是<em>由浏览器</em>实现的一个最基本的功能，诞生之初就是为了分辨用户身份而存储在客户端内存或硬盘上的数据块，大小通常为4kb。</p>
+<p><strong>优点：</strong><br>    1. Cookie历史较久，功能基本比较完善，具有生存周期Expires、有效访问路径Path、域名等等属性完善其安全性和有效性。<br>    2. 可以由服务端在请求的Response中带上Set-Cookie属性对客户端的Cookie进行设置而不需要前端额外实现。<br>    3. 浏览器在请求时会自动带上该网站对应的Cookie发送给服务端。</p>
+<p><strong>缺点：</strong><br>    1. 通常大小为4kb，在现代化网站中，可能不够用。<br>    2. 浏览器会在每个HTTP请求中，都自动带上Cookie进行请求，若Cookie较多，占用服务器带宽。<br>    3. 容易被污染，从而导致隐私泄漏，商家可依此完善用户画像，实现广告跟踪。<br>    4. Cookie可被用户禁用，影响业务。<br>    5. 非浏览器应用，如App，没有Cookie。</p>
+<h2 id="PHP、Tomcat-默认的Session"><a href="#PHP、Tomcat-默认的Session" class="headerlink" title="PHP、Tomcat 默认的Session"></a>PHP、Tomcat 默认的Session</h2><p>大多数Web容器、应用框架都提供了Session的一种默认实现方式，基本原理就是在客户端的Cookie中放一个SessionID，然后在服务器的内存中以SessionID作为key，存储对应用户的状态数据。PHP中是PHPSESSID，Tomcat是JSESSIONID。</p>
+<h2 id="Token、JWT"><a href="#Token、JWT" class="headerlink" title="Token、JWT"></a>Token、JWT</h2><p>Token（令牌）是将用户的状态数据直接存储到客户端，而不是存储在服务端中。用户在登录成功之后，服务端将用户信息和其他数据通过某种规则和编码转换成一个Token字符串，并返回给客户端，客户端在请求服务端时，带上这个Token，服务端只需要验证这个Token是否正确、有效，就可以从里面得到用户信息，而不需要在服务器上花费空间进行存储。</p>
+<p>类似的比喻，比如试卷、合同上的签名和印章，在验证文件内容真伪时，只需要验证签名或印章的痕迹是否真实有效，即可认为文件内容是否有效。</p>
+<p><a target="_blank" rel="noopener" href="https://jwt.io/">JWT(JSON Web Tokens)</a>，就是Token的一种标准(RFC 7519)，定义了一种基于Json的Token方案，包含了用户数据、校验字段以及签名策略，使jwt本身可以包含用户数据，并且不会被篡改。</p>
+<h2 id="演化"><a href="#演化" class="headerlink" title="演化"></a>演化</h2><p>这里以一个简单的web应用进行演化。</p>
+<p>在Http协议诞生之初，只是为了从服务端获取简单的静态Html数据，静态页面嘛，直接Get完请求就可以了，也不需要处理上下文之间的交互。但是渐渐的，网站有了用户账号的设计，BBS、电商、即时聊天、游戏对战等等一系列需要客户端和服务端有状态的会话需求，服务端需要知道每一个无状态的HTTP请求对应的用户是谁，所以就需要在HTTP请求中带上身份识别，这时候就可以利用<strong>Cookie</strong>。</p>
+<p>用户在登录成功时，服务端通过Set-Cookie在客户端的Cookie中保存用户身份，比如用户的ID，那么用户在登录成功后，选好商品添加购物车的时候，欸就可以把Cookie中的用户id带上，那么服务端就可以知道，这个购物车的操作是由这个id的用户做的。</p>
+<p>乍一看，好像这个方法不错，可以实现用户的状态维持。但是Cookie在客户端上是明文保存的，可以随意修改，如果某个人把cookie里的id进行修改，把id修改成别人的，那不是就可以伪造用户请求了？而且随着业务的发展，用户需要保存的信息也越来越多，比如用户权限、用户身份、上下文一些关联的业务数据等，如果这些数据也都明文保存在客户端，这明显很不安全。</p>
+<p>那么就到了<strong>session</strong>（狭义上的），把用户数据存储在服务器的内存里，用户和服务端建立联系的时候，服务端创建一个SessionID，把SessionId放到Cookie里，每次请求带上SessionID，服务端就可以根据这个来查到存储在内存里的用户信息。同时客户端只需要存储SessionID，并且这个id本身只是一个Key，那么就可以使用一些算法，使id变的较长且无规律，不容易被随意修改伪造。到这里，这也是现在大多数web框架内置session的实现方案，简单好用。</p>
+<p>经过了多年的发展，这个web应用的用户数量也逐渐多了起来，一台服务器显然不能够很好的满足逐渐膨胀的用户和业务发展，那么就需要添加服务器做负载均衡共同提供服务。</p>
+<p>问题来了，之前的用户数据是存放在服务器的内存里的，也就是用户上一次是在A服务器里处理的登录请求，那下一次用户的请求发到了B里，不是就变的没有登录了吗？</p>
+<p>处理的方案也有几种：服务器间session复制，服务器间互相同步、互相备份；在负载均衡的时候做粘连，把来自同一个用户的请求粘连在同一个服务器上；session集中存储，利用Redis等高性能第三方存储把session放到业务服务器外等等方案，这些方案都互相有优缺点，这里暂不详细展开。</p>
+<p>再回到开始的直接存储用户id的方案上，这个方案最大的问题就是单纯的用户id容易被篡改，那么是不是只要不让他被随意篡改就可以了？一个不会被随意篡改、又不用在服务器上面存储方案是不是就很完美？</p>
+<p>这是<strong>Token</strong>的方案，在登录成功后，服务端给用户一个身份凭证，上面有用户的信息，同时，服务端对这个凭证签名，让他不能被随便修改，比如对用户信息和时效信息加上服务端的私钥签名，在没有拿到服务端的私钥下，谁都不能伪造出这份签名，同时又可以通过服务端的公钥进行验证。</p>
+<p>Token的方案可以自行设计，不过业界已经有一个广泛应用的标准JWT，大部分场景直接根据这个标准进行开发就可以了。</p>
+<p>Token实现了HTTP请求的有状态和服务端的无状态，服务端上的不同服务器不需要花费空间来存储每一个用户的用户数据，转而只需要对token进行验证就可以了，经典的时间换空间，而且可以提高服务器的伸缩性，可以随意的添加业务服务器，而不需要额外处理session的各种问题。</p>
+<p>但是把Token当作凭证发放给客户端后，又怎么对客户端的用户进行管理？比如用户修改了密码，之前颁发的凭证需要失效，但是Token是在客户端上的，服务端无法主动失效Token，这是一个问题。那有人肯定会说，可以把Token在服务端上存一份呀，如果失效了给他打个标记，或者直接删除，不是就可以管理了吗？是的，这样确实可以在服务端上对Token进行管理，但是这样，服务端也从无状态变回了有状态，又需要处理Token在服务端上的存储、共享等等问题，和session有什么本质上的区别吗？</p>
+<p>上面的不论sessionID还是token都是存放在cookie里的，但是要注意，这个cookie只是浏览器都支持自动处理的一个headers而已，所以在具体实现上，不论是sessionID还是token都可以放到其他的header头里，区别就是需要客户端代码自行处理而已，包括App等非浏览器应用。</p>
+<p>综上所述，各种方案实现都有相对应的好处和问题，没有哪种方案是完美的，在一个应用中，需要根据业务本身的用户规模、服务器情况、安全程度、业务逻辑和用户体验，选择适合的方案，或是互相结合在不同的场景使用不同的方案。</p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><p>互联网应用最重要的问题就是安全，各种Session技术、加密算法都是为了增加攻击成本、提高安全性。</p>
+<p>上面的方案中，很明显有一个致命的问题，每个方案基本都依赖于服务端给客户端发送的一组识别用户身份的字符串，那假如有人在中间抓包，拿到这个字符串，是不是就不安全了。是的，这是中间人攻击的一种方式。</p>
+<p>如何避免，这个问题如果基于HTTP是没有很好的方案的，较好的方案就是使用HTTPS，基于可信根证书和端到端的加密来实现整个链路上的传输安全。</p>
+<p>通过其他字段综合对用户身份进行验证，比如设备MAC、IP地址等信息综合判断。</p>
+<p>在核心重要功能如支付，使用二次验证（密码、短信等）。</p>
+<p>减少token的有效时间，并在每次请求中对token进行刷新。</p>
+<p>安全的前提是客户端安全，如果客户端本身状态危险，那么任何的安全措施都是无效的。</p>
+<p>用户需要做的：</p>
+<ol>
+<li>保持操作系统安全，不被挂马、不被其他人操作，这是设备的安全。</li>
+<li>使用可靠的浏览器、确认浏览器的各种设置。</li>
+<li>避免安装不可信的CA根证书（数字证书），证书是保证HTTPS安全的前提，通常受信的证书是内置在操作系统中的，以及用户自行安装的，比如常见的网银证书。如果安装不可信的假CA证书，那么攻击者就可以伪造CA证书，自己对自己的请求进行签发，欺骗客户端，由于客户端安装了假CA证书，并不会对中间人的伪造证书报警。</li>
+<li>确认网站地址正确，确认证书的有效性和签发机构。</li>
+<li>代理，使用代理上网，那么代理本身就是一个中间人……</li>
+<li>注意防范社工，社会工程学攻击。</li>
+</ol>
+<p>服务端需要做的：</p>
+<ol>
+<li>使用HTTPS</li>
+<li>业务上对XSS、CROS等等攻击手段进行防范</li>
+<li>使用验证码防止暴力</li>
+<li>保证服务器本身及内网安全</li>
+<li>敏感操作要求二次验证</li>
+<li>对用户设备、ip进行绑定和验证</li>
+<li>不使用任何自己想的奇奇怪怪的加密方式和算法。古典密码学的编码和破译通常依赖于算法本身的设计和对手的想象力和创造力，一但算法公开就不具备安全性，而现代密码学的安全性依赖于密钥而不是算法本身的保密性。而目前常用的密码学算法都是开源且经过了各种专家的验证和分析，适用场景、破解成本、优缺点已经很明确且公开，在不出现重大技术突破的情况下，可以基本保证安全。</li>
+</ol>
+<h1 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h1><p>上面所说的都只是互联网应用中认证与授权中的认证，即“我是谁”的问题。而授权则是控制用户对于系统的访问权限。</p>
+<p>在系统庞大、功能复杂的情况下，可能会有多个完全不同的域名，或者是其他第三方登录的实现。那么就有了SSO和OAuth</p>
+<p>SSO是单点登录，主要是处理一个公司的不同系统下的访问登录问题（如淘宝和天猫，他们的域是不同的，但是可以相互跳转不需要重新认证）</p>
+<p>OAuth主要是不同公司间的授权方案，授权用户在第三方应用中访问自己在自己系统的一些隐私数据，比如一些网站的qq登录、微博登录等第三方账号登录。</p>
+<p>这部分具体的内容在此不展开描述只是作为相关点提一下，后续可能会继续更新相应文章展开。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/" class="category-chain-item">信息安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Web/">#Web</a>
+      
+        <a href="/tags/Session/">#Session</a>
+      
+        <a href="/tags/Cookie/">#Cookie</a>
+      
+        <a href="/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">#信息安全</a>
+      
+        <a href="/tags/%E8%AE%A4%E8%AF%81/">#认证</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机中的会话(Session)</div>
+      <div>http://example.com/信息安全/计算机中的会话-session/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>MaoxianCk</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年5月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%E7%AE%97%E6%B3%95%E7%9B%B8%E5%85%B3/%E7%BC%96%E7%A0%81%E7%AE%97%E6%B3%95/" title="编码算法">
+                        <span class="hidden-mobile">编码算法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

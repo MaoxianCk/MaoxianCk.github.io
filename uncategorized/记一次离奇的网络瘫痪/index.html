@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="MaoxianCk">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="今天下午，当我正在coding的时候，一上百度发现网络断开，紧接着qq下线、steam登出…刹时间我意识到，网络崩了。没过多久，系统（win10）右下角的网络显示网络无连接，尝试在“网络与Internet设置”中关闭有线连接适配器。  万万没想到，当我禁用之后再次启用的时候居然无法启动，于是重启系统，结果又卡在了“正在重启”的界面，过了一会感觉像是卡住了就关机键长按关机再开机。开机的时候刷了一下手">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次离奇的网络瘫痪">
+<meta property="og:url" content="http://example.com/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/index.html">
+<meta property="og:site_name" content="毛线球上的喵星人">
+<meta property="og:description" content="今天下午，当我正在coding的时候，一上百度发现网络断开，紧接着qq下线、steam登出…刹时间我意识到，网络崩了。没过多久，系统（win10）右下角的网络显示网络无连接，尝试在“网络与Internet设置”中关闭有线连接适配器。  万万没想到，当我禁用之后再次启用的时候居然无法启动，于是重启系统，结果又卡在了“正在重启”的界面，过了一会感觉像是卡住了就关机键长按关机再开机。开机的时候刷了一下手">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/assets/img/0bf5b4b02e59c95b0b37017eee894f00-ce4604-1610094903.png?x-oss-process=style/mxcompress">
+<meta property="og:image" content="http://example.com/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/assets/img/039c7638b4cb69ebe053494d43248011-ef9a80-1610094927.png?x-oss-process=style/mxcompress">
+<meta property="article:published_time" content="2019-07-19T08:51:52.000Z">
+<meta property="article:modified_time" content="2021-01-08T08:58:14.028Z">
+<meta property="article:author" content="MaoxianCk">
+<meta property="article:tag" content="程序">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/uncategorized/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%A6%BB%E5%A5%87%E7%9A%84%E7%BD%91%E7%BB%9C%E7%98%AB%E7%97%AA/assets/img/0bf5b4b02e59c95b0b37017eee894f00-ce4604-1610094903.png?x-oss-process=style/mxcompress">
+  
+  
+  
+  <title>记一次离奇的网络瘫痪 - 毛线球上的喵星人</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>毛线球上的喵星人</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/asset/images/default-bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="记一次离奇的网络瘫痪"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2019-07-19 08:51" pubdate>
+          2019年7月19日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">记一次离奇的网络瘫痪</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>今天下午，当我正在coding的时候，一上百度发现网络断开，紧接着qq下线、steam登出…刹时间我意识到，网络崩了。没过多久，系统（win10）右下角的网络显示网络无连接，尝试在“网络与Internet设置”中关闭有线连接适配器。</p>
+<p><img src="./assets/img/0bf5b4b02e59c95b0b37017eee894f00-ce4604-1610094903.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>万万没想到，当我禁用之后再次启用的时候居然无法启动，于是重启系统，结果又卡在了“正在重启”的界面，过了一会感觉像是卡住了就关机键长按关机再开机。开机的时候刷了一下手机，结果发现连着家庭wifi的手机正常上网？？？开机之后，尝试打开一个网页，居然成功了？？？</p>
+<p>正当我以为网络正常的时候，打开了一个新网页，又出现了刚才的情况——没网了。于是输入192.168.3.1(这是我家主路由的ip地址），结果发现有线连接的路由器居然都连不上了，同时使用手机登录该地址查看路由设置，正常，检查了一下路由连接的终端设备，无线连接设备一切正常，有线连接一个都没有…这时我感觉到，事情并没有这么简单…</p>
+<h5 id="网络情况介绍"><a href="#网络情况介绍" class="headerlink" title="网络情况介绍"></a>网络情况介绍</h5><p><img src="./assets/img/039c7638b4cb69ebe053494d43248011-ef9a80-1610094927.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img">拓扑结构</p>
+<p>上图是家里的网络拓扑结构图，入户光猫为网络入口，ip地址为192.168.1.1并且隐藏ssid，不作为日常使用。主路由为家中的主要路由设备，放置在书房作为主要的wifi广播信号，ip地址为192.168.3.1，有线设备全部通过交换机连接。由于额外一间房间由于户型结构的问题与主路由距离较远且中间有墙隔挡，wifi信号极差，正好家中有一台闲置的旧路由，就作为中继路由拓展主路由的无线信号（关闭DHCP、SSID和密码与主路由设置相同），并且因为这个是放在非主要房间的某个角落，所以我自己都忘了还有这个设备（这是前提）</p>
+<h5 id="排查问题"><a href="#排查问题" class="headerlink" title="排查问题"></a>排查问题</h5><p>开始排查问题，首先主机尝试登录192.168.3.1与192.168.1.1，均无法连接并且ping不通。之后尝试手机登录，均正常连接，查看终端设备发现没有有线设备。查看交换机，交换机上所有连接设备信号灯都在，并且闪烁，尝试拔出线缆，主机识别网线拔出，但是再插入时依然显示无网络连接。结合今日高温天气并且没有开空调，认为是网络设备高温宕机了，于是关闭所有路由和交换机（不包括中继路由）。几分钟后，设备温度恢复常温后再次开机，此时网络恢复，有线无线均正常，但是过了一会再次出现了以上的情况。此时发现无线连接的设备虽然可以上网但是一会可以一会不行，而有线连接是持续无法上网。</p>
+<p>开始怀疑为设备故障的问题，尝试断开交换机，将主机连至主路由上，此时主机提示发现新网络并且网络正常。此时怀疑为交换机宕机。再次连接交换机，经过一段时间，再次出现网络无法连接。之后使用排除法，拔出所有交换机连接，仅保留与主路由连接线，每次插入一条网线进行排除测试。</p>
+<p>最后，发现已经有一条线路连接上后，网络就出现瘫痪。随后检查该线路发现了已经被我遗忘的中继路由。尝试断开该中继路由发现网络恢复正常…至此，终于发现罪魁祸首。</p>
+<h5 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h5><p>可是为什么正常使用了一年时间才突然出现这个问题呢？推测如下：检查中继路由上的标签发现这个路由是2011年购买并且此前在老家作为主路由服役了较长时间，又由于高温导致该路由器故障异常，可是为什么子路由故障会导致整个网段瘫痪呢？结合交换机上的信号灯在所有设备均没有发起网络请求的情况下剧烈闪烁，推测由于设备故障引起了广播风暴导致网络发生阻塞…</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%A8%8B%E5%BA%8F/">#程序</a>
+      
+        <a href="/tags/Web/">#Web</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>记一次离奇的网络瘫痪</div>
+      <div>http://example.com/uncategorized/记一次离奇的网络瘫痪/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>MaoxianCk</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2019年7月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/uncategorized/%E5%A5%BD%E7%94%A8%E7%9A%84%E8%BD%AF%E4%BB%B6%E6%94%B6%E9%9B%86/" title="好用的软件收集">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">好用的软件收集</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%B8%80-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="SpringBoot Web项目开发(一) 环境搭建">
+                        <span class="hidden-mobile">SpringBoot Web项目开发(一) 环境搭建</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

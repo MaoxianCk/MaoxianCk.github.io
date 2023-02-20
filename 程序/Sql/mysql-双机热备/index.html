@@ -1,0 +1,720 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="MaoxianCk">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="首先建立两个mysql环境。该文章中数据库环境为Centos7, mysql5.7.28，均为虚拟机，在主机上使用Navicat通过局域网连接两个数据库进行测试。 由于复制功能基于二进制日志，所以在开启复制之前，应保证两个数据库中都有相同的库结构及数据，否则容易引起复制语句异常。Mysql的版本最好保持一致避免可能的异常。 基本的条件： 主从数据库连接正常，能正常Ping通。 端口正确开放 防火墙">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql-双机热备">
+<meta property="og:url" content="http://example.com/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/index.html">
+<meta property="og:site_name" content="毛线球上的喵星人">
+<meta property="og:description" content="首先建立两个mysql环境。该文章中数据库环境为Centos7, mysql5.7.28，均为虚拟机，在主机上使用Navicat通过局域网连接两个数据库进行测试。 由于复制功能基于二进制日志，所以在开启复制之前，应保证两个数据库中都有相同的库结构及数据，否则容易引起复制语句异常。Mysql的版本最好保持一致避免可能的异常。 基本的条件： 主从数据库连接正常，能正常Ping通。 端口正确开放 防火墙">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/assets/img/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress">
+<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/assets/img/33e2a5a631164c121e05e5fb3b922534-0ef7b2-1610094861.jpeg?x-oss-process=style/mxcompress">
+<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/assets/img/efc3cc448668a197371dc3b9b2bf0a39-87e9c4-1610094876.jpeg?x-oss-process=style/mxcompress">
+<meta property="article:published_time" content="2019-11-20T08:51:52.000Z">
+<meta property="article:modified_time" content="2021-01-08T09:08:48.543Z">
+<meta property="article:author" content="MaoxianCk">
+<meta property="article:tag" content="程序">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/Sql/mysql-%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/assets/img/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress">
+  
+  
+  
+  <title>Mysql-双机热备 - 毛线球上的喵星人</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>毛线球上的喵星人</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/asset/images/default-bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Mysql-双机热备"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2019-11-20 08:51" pubdate>
+          2019年11月20日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Mysql-双机热备</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>首先建立两个mysql环境。该文章中数据库环境为Centos7, mysql5.7.28，均为虚拟机，在主机上使用Navicat通过局域网连接两个数据库进行测试。</p>
+<p>由于复制功能基于二进制日志，所以在开启复制之前，应保证两个数据库中都有相同的库结构及数据，否则容易引起复制语句异常。Mysql的版本最好保持一致避免可能的异常。</p>
+<h2 id="基本的条件："><a href="#基本的条件：" class="headerlink" title="基本的条件："></a>基本的条件：</h2><ul>
+<li>主从数据库连接正常，能正常Ping通。</li>
+<li>端口正确开放</li>
+<li>防火墙等的配置（避免在读取二进制日志时出现问题）</li>
+</ul>
+<p><img src="./assets/img/c87432de99adf6d978e6d863256606ac-ffa581-1610094856.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><img src="./assets/img/33e2a5a631164c121e05e5fb3b922534-0ef7b2-1610094861.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="修改数据库配置文件-etc-my-cnf"><a href="#修改数据库配置文件-etc-my-cnf" class="headerlink" title="修改数据库配置文件 /etc/my.cnf"></a>修改数据库配置文件 /etc/my.cnf</h2><p>在<strong>数据库A</strong>的[mysqld]部分添加或修改以下内容：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">server_id=<span class="hljs-number">1</span> <span class="hljs-regexp">//</span>数据库A 的唯一标识，必须唯一<br>log-bin=master_01 <span class="hljs-regexp">//</span>开启二进制日志，数据库同步的基础<br>binlog-<span class="hljs-keyword">do</span>-db=test_A <span class="hljs-regexp">//</span> 需要同步的库，两边的库名字要一样并且一行只能写一个库<br></code></pre></td></tr></table></figure>
+
+<p>在<strong>数据库B</strong>的[mysqld]部分添加或修改以下内容：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">server_id</span>=<span class="hljs-number">2</span><br><span class="hljs-attr">log-bin</span>=master_02<br><span class="hljs-attr">binlog-do-db</span>=test_A<br></code></pre></td></tr></table></figure>
+
+<p>若需要同步多个库需要将binlog-do-db分为多行写，如下</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_A<br><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_B<br><span class="hljs-attribute">binlog-do-db</span><span class="hljs-operator">=</span>test_C<br></code></pre></td></tr></table></figure>
+
+<p>要注意 “binlog-do-db=test_A, test_B, test_C” 这种写法是<strong>错误</strong>的，会将ABC认为是同一个库, 并且在后续操作中不会出现异常报错</p>
+<p>修改完成后<strong>重启数据库</strong>使修改生效</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">systemctl <span class="hljs-built_in">restart</span> mysqld.service<br></code></pre></td></tr></table></figure>
+
+<h2 id="配置主从复制功能"><a href="#配置主从复制功能" class="headerlink" title="配置主从复制功能"></a>配置主从复制功能</h2><p>进入mysql控制台，查看当前<strong>数据库A</strong>的状态，并且记录File和Position值</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">show <span class="hljs-keyword">master</span> <span class="hljs-title">status</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="./assets/img/efc3cc448668a197371dc3b9b2bf0a39-87e9c4-1610094876.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>如图，记录的File值为master_01.000001，Position值为2653</p>
+<p><em>注意，在运行show master status命令前，应保证该数据库无任何</em>***写操作***<em>，应停止服务或者加入 FLUSH TABLES WITH READ LOCK 锁。同时可在此时对数据库进行备份，并且将数据保存到另一个数据库中（表结构及数据等）以保证数据一致性并且防止后续操作出现异常。</em></p>
+<p>记录好值以后可以开放数据库A</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf">UNLOCK TABLES<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+
+<p>来到<strong>数据库B</strong> 中，关闭复制功能</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">stop</span> <span class="hljs-literal">slave</span>;<br></code></pre></td></tr></table></figure>
+
+<p>配置复制功能，修改下列代码中为对应的值，并执行</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">CHANGE MASTER <span class="hljs-keyword">TO</span><br><span class="hljs-attribute">MASTER_HOST</span>=<span class="hljs-string">&#x27;数据库A的ip地址&#x27;</span>,<br><span class="hljs-attribute">MASTER_USER</span>=<span class="hljs-string">&#x27;数据库A提供的用于复制的用户&#x27;</span>,<br><span class="hljs-attribute">MASTER_PASSWORD</span>=<span class="hljs-string">&#x27;密码&#x27;</span>,<br><span class="hljs-attribute">MASTER_PORT</span>=3306,<br><span class="hljs-attribute">MASTER_LOG_FILE</span>=<span class="hljs-string">&#x27;刚记录的数据库A的File文件名&#x27;</span>,<br><span class="hljs-attribute">MASTER_LOG_POS</span>=刚记录的数据库A的Position值,<br><span class="hljs-attribute">MASTER_CONNECT_RETRY</span>=数据库A的server_id;<br></code></pre></td></tr></table></figure>
+
+<p>开启复制功能</p>
+<p>start slave;</p>
+<p>同样的，对数据库B也是同样的操作，<br>记录<strong>数据库B</strong> 的状态值</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">show <span class="hljs-keyword">master</span> <span class="hljs-title">status</span>; <br></code></pre></td></tr></table></figure>
+
+<p>然后在<strong>数据库A</strong> 中</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">stop</span> <span class="hljs-literal">slave</span>; <br></code></pre></td></tr></table></figure>
+
+<p>执行代码（将上文代码中数据库A的值换为数据库B的）</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">CHANGE MASTER <span class="hljs-keyword">TO</span><br><span class="hljs-attribute">MASTER_HOST</span>=<span class="hljs-string">&#x27;数据库B的ip地址&#x27;</span>,<br><span class="hljs-attribute">MASTER_USER</span>=<span class="hljs-string">&#x27;数据库B提供的用于复制的用户&#x27;</span>,<br><span class="hljs-attribute">MASTER_PASSWORD</span>=<span class="hljs-string">&#x27;密码&#x27;</span>,<br><span class="hljs-attribute">MASTER_PORT</span>=3306,<br><span class="hljs-attribute">MASTER_LOG_FILE</span>=<span class="hljs-string">&#x27;刚记录的数据库B的File文件名&#x27;</span>,<br><span class="hljs-attribute">MASTER_LOG_POS</span>=刚记录的数据库B的Position值,<br><span class="hljs-attribute">MASTER_CONNECT_RETRY</span>=数据库B的server_id;<br></code></pre></td></tr></table></figure>
+
+<p>开启复制功能</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-literal">start</span> <span class="hljs-literal">slave</span>;<br></code></pre></td></tr></table></figure>
+
+<p>配置完两个数据库后执行</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima"><span class="hljs-built_in">show</span> slave <span class="hljs-built_in">status</span>\G;<br></code></pre></td></tr></table></figure>
+
+<p>查看配置情况，若无发现Error报错信息，则正常启动，可以通过Navicat等可视化软件对配置的库进行测试。若一切正常，在AB数据库中的操作均可正常复制到另一个数据库中。</p>
+<h2 id="可能的问题"><a href="#可能的问题" class="headerlink" title="可能的问题"></a>可能的问题</h2><p>same uuid：我在配置过程中发现这个问题，原因是因为在配置虚拟机环境时是配置好一个虚拟机的mysql环境后直接使用VMware的克隆功能，导致两个数据库的uuid相同。解决方法：删除任意一个数据库的auto.conf文件（在my.cnf文件中datadir对应的路径下，一般是/var/lib/mysql/ ）删除后重启该数据库，会重新生成该文件。</p>
+<p>Slave_IO_Running: NO ：表示在拉取二进制日志时出现异常，通常是由防火墙导致</p>
+<p>Slave_IO_Running: Connecting ：连接错误或者配置错误，检查数据库ip地址及端口，检查配置的ip地址是否错误，防火墙拦截等。</p>
+<h2 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h2><p><a target="_blank" rel="noopener" href="https://blog.51cto.com/13577495/2167525">https://blog.51cto.com/13577495/2167525</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.mysqlzh.com/doc/55.html">https://www.mysqlzh.com/doc/55.html</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%A8%8B%E5%BA%8F/" class="category-chain-item">程序</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E7%A8%8B%E5%BA%8F/Sql/" class="category-chain-item">Sql</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%A8%8B%E5%BA%8F/">#程序</a>
+      
+        <a href="/tags/Web/">#Web</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Mysql-双机热备</div>
+      <div>http://example.com/程序/Sql/mysql-双机热备/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>MaoxianCk</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2019年11月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%9F%A5%E8%AF%A2%E8%A1%A8%E4%B8%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E7%AC%A6%E5%90%88%E6%9D%A1%E4%BB%B6%E7%9A%84%E8%AE%B0%E5%BD%95/" title="SQL查询表中是否存在符合条件的记录">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SQL查询表中是否存在符合条件的记录</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/uncategorized/%E5%A5%BD%E7%94%A8%E7%9A%84%E8%BD%AF%E4%BB%B6%E6%94%B6%E9%9B%86/" title="好用的软件收集">
+                        <span class="hidden-mobile">好用的软件收集</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

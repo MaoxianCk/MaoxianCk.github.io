@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="MaoxianCk">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="boot是bootstrap的简写形式，当然这里的bootstrap不是指web框架的bootstrap，而是指计算机的“引导”。 bootstrap原意是靴子，但是这跟计算机有什么关系呢？ 这源于一句谚语：  pull oneself up by one’s bootstraps 拽着鞋带把自己拉起来  这个句子很有意思，就像左脚踩右脚不断交替就能上天一样。 工程师把这个用来比喻计算机启动的过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于计算机的 Boot">
+<meta property="og:url" content="http://example.com/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/index.html">
+<meta property="og:site_name" content="毛线球上的喵星人">
+<meta property="og:description" content="boot是bootstrap的简写形式，当然这里的bootstrap不是指web框架的bootstrap，而是指计算机的“引导”。 bootstrap原意是靴子，但是这跟计算机有什么关系呢？ 这源于一句谚语：  pull oneself up by one’s bootstraps 拽着鞋带把自己拉起来  这个句子很有意思，就像左脚踩右脚不断交替就能上天一样。 工程师把这个用来比喻计算机启动的过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/assets/img/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress">
+<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/assets/img/b864d20e64f6e15e211f6017b3af5981-d3c0bd-1610095362.png?x-oss-process=style/mxcompress">
+<meta property="article:published_time" content="2020-04-16T08:51:57.000Z">
+<meta property="article:modified_time" content="2021-01-08T09:06:39.693Z">
+<meta property="article:author" content="MaoxianCk">
+<meta property="article:tag" content="程序">
+<meta property="article:tag" content="代码">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E5%85%B3%E4%BA%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84-boot/assets/img/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress">
+  
+  
+  
+  <title>关于计算机的 Boot - 毛线球上的喵星人</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>毛线球上的喵星人</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/asset/images/default-bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="关于计算机的 Boot"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-04-16 08:51" pubdate>
+          2020年4月16日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">关于计算机的 Boot</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>boot是bootstrap的简写形式，当然这里的bootstrap不是指<a target="_blank" rel="noopener" href="https://getbootstrap.com/">web框架</a>的bootstrap，而是指计算机的“引导”。</p>
+<p>bootstrap原意是靴子，但是这跟计算机有什么关系呢？</p>
+<p>这源于一句谚语：</p>
+<blockquote>
+<p>pull oneself up by one’s bootstraps</p>
+<p>拽着鞋带把自己拉起来</p>
+</blockquote>
+<p>这个句子很有意思，就像左脚踩右脚不断交替就能上天一样。</p>
+<p>工程师把这个用来比喻计算机启动的过程，原因是因为：计算机上的大多数程序是由其他程序加载到计算机上的，那就意味着需要有一个机制将初始程序加载到计算机上。换句话说就是，计算机需要启动才能运行程序，而运行程序则需要启动计算机，而这明显是不能实现的。</p>
+<p><em>解释清楚死锁，我们就雇你；雇我我就解释给你听；来吧，我们讨论一下薪水的事情吧！</em></p>
+<p>早期的工程师使用各种方法把程序放入内存中以临时解决该问题，直到后来<strong>Rom</strong>的出现彻底解决了这个问题。</p>
+<blockquote>
+<p>Read-only memory (ROM) is a type of non-volatile memory used in computers and other electronic devices. Data stored in ROM cannot be electronically modified after the manufacture of the memory device. </p>
+<p>摘自<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Read-only_memory">wiki</a></p>
+</blockquote>
+<p>翻译：只读存储器是一种在计算机和其他电子设备中使用的非易失性存储设备。存储在Rom中的数据一经制造就无法以电子方式修改。</p>
+<p>当然，随着科技的发展，Rom已经发展出了许多种类：可编程只读存储器（PROM）、可擦可编程序只读存储器（EPROM）和电可擦可编程只读存储器ROMROM（EEPROM），Rom已经不再是出厂就无法修改，从而也衍生出刷BIOS、刷Rom等操作了。</p>
+<p>而现在，这个Rom就存在计算机的主板上，里面写入的程序呢，就是<strong>BIOS</strong>。</p>
+<p><strong>BIOS ( Basic Input Output System )</strong> ，是计算机启动后运行的第一个程序。这个程序的功能就是最基本的输入输出、计算机自检和系统自启功能。</p>
+<p>计算机启动后，运行BIOS，首先进行自检，检查计算机上的硬件（CPU、内存等）是否满足运行的条件，若没有问题则转入下一阶段，否则报警并中止。</p>
+<p>自检没有问题，那么下一步就是决定启动顺序。</p>
+<p>经常装系统的同学可能很熟悉这个操作：插上U盘，按下开机键（短接电源），猛按f8或者某个按键，在屏幕弹出来的窗口上选择U盘，然后就进入PE或者是系统安装程序进行系统的安装。</p>
+<p><img src="./assets/img/2d1575284cf52f1871bd04a7cf2d75b4-5a96bb-1610095398.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>BIOS启动后，需要运行下一个程序，也就是要找到下一个启动程序所在的存储设备（例如硬盘或者U盘）。</p>
+<p>BIOS根据用户选择的启动设备或者是默认的启动顺序，判断该设备是否可用于引导（判断设备的第一个扇区，最前面的512字节的最后两个字节是否是0x55和0xAA，这512个字节就叫MBR 主引导记录）</p>
+<p>现在知道设备可用于启动了，那么现在就需要知道该到哪去运行下一个程序。而MBR中存储的就是操作系统在该设备上的位置，下一步就显而易见了，找到操作系统，启动！</p>
+<p><img src="./assets/img/b864d20e64f6e15e211f6017b3af5981-d3c0bd-1610095362.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>文章篇幅看似挺长，对于今天的计算机来讲，不过是“弹指一瞬间”，按下开机按钮，不出一会屏幕上就显示出操作系统的启动动画，或者对于土豪玩家，说不定已经能看到桌面了（汗。</p>
+<p>当然，上文中描述的启动顺序也并不完整，其中省略了一些关于分区表的部分，并且文章中说的MBR+BIOS的引导启动已经是过去式了，现在的引导方式也都变成了GPT+UEFI的形式。</p>
+<p>MBR和GPT其实都是分区表的两种种类，MBR是512字节，一个主分区的扇区总数不超过2^32即逻辑地址有32位，而每个扇区大小512字节，2^32*512即2T，所以MBR支持的最大容量为2T；而GPT逻辑地址提升至64位，则理论最大分区大小为2^64-1*512即18eb（1eb=1024pb=1024^2tb）。</p>
+<p>UEFI和BIOS的话，可以说UEFI相当于BIOS的升级版，兼容性、容错性、纠错性等更好，具体参见<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface">Wiki</a>。</p>
+<p>总的来说，系统启动的过程就像多米诺骨牌一样，由小到大，从一开始的BIOS逐步启动到操作系统。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%A8%8B%E5%BA%8F/" class="category-chain-item">程序</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/" class="category-chain-item">闲聊</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%A8%8B%E5%BA%8F/">#程序</a>
+      
+        <a href="/tags/%E4%BB%A3%E7%A0%81/">#代码</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>关于计算机的 Boot</div>
+      <div>http://example.com/程序/闲聊/关于计算机的-boot/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>MaoxianCk</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2020年4月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/%E7%A8%8B%E5%BA%8F/%E9%97%B2%E8%81%8A/%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B9%90%E8%B6%A3/" title="编程的乐趣">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">编程的乐趣</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%E7%A8%8B%E5%BA%8F/Sql/sql%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2count/" title="SQL根据不同的条件查询count">
+                        <span class="hidden-mobile">SQL根据不同的条件查询count</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
