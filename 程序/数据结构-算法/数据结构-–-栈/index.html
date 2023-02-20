@@ -16,16 +16,15 @@
   <meta name="author" content="MaoxianCk">
   <meta name="keywords" content="">
   
-    <meta name="description" content="栈本质上是线性表，而且是操作受限的线性表。 栈的概念栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。  把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。  如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1">
+    <meta name="description" content="栈本质上是线性表，而且是操作受限的线性表。 栈的概念栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。   把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。 如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据结构 – 栈">
 <meta property="og:url" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/index.html">
 <meta property="og:site_name" content="毛线球上的喵星人">
-<meta property="og:description" content="栈本质上是线性表，而且是操作受限的线性表。 栈的概念栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。  把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。  如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1">
+<meta property="og:description" content="栈本质上是线性表，而且是操作受限的线性表。 栈的概念栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。   把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。 如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/assets/img/747f75b76bb2b72be3e5413826fd1c3c-c86e9a-1610094817.jpeg?x-oss-process=style/mxcompress">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/747f75b76bb2b72be3e5413826fd1c3c-c86e9a-1610094817.jpeg">
 <meta property="article:published_time" content="2020-02-25T08:51:55.000Z">
 <meta property="article:modified_time" content="2021-01-08T09:03:20.054Z">
 <meta property="article:author" content="MaoxianCk">
@@ -34,7 +33,7 @@
 <meta property="article:tag" content="代码">
 <meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress">
+<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg">
   
   
   
@@ -283,16 +282,17 @@
                 
                 <p>栈本质上是线性表，而且是操作受限的线性表。</p>
 <h2 id="栈的概念"><a href="#栈的概念" class="headerlink" title="栈的概念"></a>栈的概念</h2><p>栈，是一种后进先出（LIFO, last in first out）的线性数据结构。与一般线性表（数组、链表）不同，栈是一种操作受限的线性表，只允许在栈的一端进行出栈（pop）和入栈（push）操作。</p>
-<p><img src="./assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <p>把线性表看成上图中的桶，只允许在表的一端进行入栈和出栈操作，这个桶就是栈。</p>
-<p><img src="./assets/img/48e758395b3246ce9032c9bb63a6ec99-0737d7-1610094343.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
 <p>如上图所示，以1、2、3、4的顺序依次将数据推入栈中，最先进去的1在栈的最底部，而最后进去的4则在栈的最上方。由于只能在栈的顶部出入，所以如果此时出栈，那么最后进去的4反而会成为出栈的元素。</p>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里使用C++语言示范，栈中存储的数据类型为int</p>
 <p>首先定义一个容量为maxSize的数组，这里设置为100。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> maxSize = <span class="hljs-number">100</span>;<br><span class="hljs-type">int</span> top = <span class="hljs-number">-1</span>;<br><span class="hljs-type">int</span>* stack = <span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[maxSize];<br></code></pre></td></tr></table></figure>
 
 <p>top是一个int类型的值，称之为栈中的头指针或者栈顶。top永远指向当前栈中存储的数据的顶部，在初始化时，栈中是空的，所以我们将top值设为1 。可以发现，当top = -1时表示空栈，也就是栈里没有数据，当top &gt;= 0时，即表示当前栈顶的元素为stack[top]。</p>
-<p><img src="./assets/img/747f75b76bb2b72be3e5413826fd1c3c-c86e9a-1610094817.jpeg?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E2%80%93-%E6%A0%88/747f75b76bb2b72be3e5413826fd1c3c-c86e9a-1610094817.jpeg" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">top++;<br>stack[top] = value;<br></code></pre></td></tr></table></figure>
 
 <p>入栈时先将top加1，然后设置栈顶的值。当然，实际使用时要注意检查top指针是否越界。</p>

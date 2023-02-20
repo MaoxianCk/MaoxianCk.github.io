@@ -16,15 +16,15 @@
   <meta name="author" content="MaoxianCk">
   <meta name="keywords" content="">
   
-    <meta name="description" content="错误排查最近在部署Vue项目时，出现如下错误：  一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。 比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下： 12">
+    <meta name="description" content="错误排查最近在部署Vue项目时，出现如下错误：   一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。 比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下： 1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue项目在Nginx非root目录下部署的问题">
 <meta property="og:url" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="毛线球上的喵星人">
-<meta property="og:description" content="错误排查最近在部署Vue项目时，出现如下错误：  一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。 比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下： 12">
+<meta property="og:description" content="错误排查最近在部署Vue项目时，出现如下错误：   一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。 比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下： 1">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/assets/img/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/assets/img/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png?x-oss-process=style/mxcompress">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png">
 <meta property="article:published_time" content="2020-10-21T08:51:59.000Z">
 <meta property="article:modified_time" content="2021-01-08T09:07:55.884Z">
 <meta property="article:author" content="MaoxianCk">
@@ -32,7 +32,7 @@
 <meta property="article:tag" content="代码">
 <meta property="article:tag" content="Web">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/assets/img/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress">
+<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png">
   
   
   
@@ -280,7 +280,8 @@
               <div class="markdown-body">
                 
                 <h2 id="错误排查"><a href="#错误排查" class="headerlink" title="错误排查"></a>错误排查</h2><p>最近在部署Vue项目时，出现如下错误：</p>
-<p><img src="./assets/img/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/009501e2311bca14f237f5d30a9f8ac2-378b44-1610095800.png" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <p>一开始以为是常见的无限路由导致的爆栈这类基础问题，但是考虑到在本地调试时一切正常，并且在本次版本更新前生产环境也正常运行。于是直接被整懵，一度怀疑是更新了依赖包版本导致的问题。在尝试了调整路由配置、依赖包版本回退、项目回退均无果后，换了台服务器进行部署测试，结果正常运行。</p>
 <p>比较后发现，在项目部署的原服务器上，还运行着一个用户端项目，路径如下：</p>
 <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nginx">/      用户端<br>/<span class="hljs-attribute">admin</span> 管理员端<br></code></pre></td></tr></table></figure>
@@ -291,7 +292,8 @@
 <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs nginx">module.<span class="hljs-attribute">exports</span> = &#123;<br>  // publicPath: &#x27;./&#x27;,   // 注释原配置<br>  publicPath: &#x27;/admin/&#x27;, // 修改为要配置的路径，注意两个斜杠<br>  其他配置...<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>重新build项目，检查打包后的dist文件夹中的index.html文件的资源引用路径是否正确（publicPath打头的路径）</p>
-<p><img src="./assets/img/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/Web/vue%E9%A1%B9%E7%9B%AE%E5%9C%A8nginx%E9%9D%9Eroot%E7%9B%AE%E5%BD%95%E4%B8%8B%E9%83%A8%E7%BD%B2%E7%9A%84%E9%97%AE%E9%A2%98/f48c4c3cab9bf32d52e1043e5341c724-54d547-1610095811.png" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <p>修改nginx配置文件，nginx.conf</p>
 <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-comment"># 用户端路径，使用root配置</span><br><span class="hljs-section">location</span> / &#123;<br>    <span class="hljs-attribute">root</span>   html/dist;<br>    <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ <span class="hljs-variable">@router</span>;<br>    <span class="hljs-attribute">index</span>  index.html index.htm;<br>&#125;<br><span class="hljs-comment"># 管理员端配置，使用alias配置虚拟路径，匹配路径时使用rewrites重写定位</span><br><span class="hljs-section">location</span><span class="hljs-regexp"> ^~/admin</span> &#123;<br>    <span class="hljs-attribute">alias</span> html/admin/;<br>    <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ <span class="hljs-variable">@rewrites</span>;<br>&#125;<br><span class="hljs-comment"># 将管理员端路径重写定位</span><br><span class="hljs-section">location</span> <span class="hljs-variable">@rewrites</span>&#123;<br>    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(admin)/(.+)$</span> /<span class="hljs-variable">$1</span>/index.html <span class="hljs-literal">last</span>;<br>&#125;<br><span class="hljs-comment"># 后端代理</span><br><span class="hljs-section">location</span> /local &#123;<br>    <span class="hljs-attribute">proxy_pass</span>  http://localhost:8080/;<br>&#125;<br></code></pre></td></tr></table></figure>
 

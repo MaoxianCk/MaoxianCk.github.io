@@ -16,22 +16,22 @@
   <meta name="author" content="MaoxianCk">
   <meta name="keywords" content="">
   
-    <meta name="description" content="客户端使用下载地址在此 安装过程省略。 安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。 安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。  Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址 directory">
+    <meta name="description" content="客户端使用下载地址在此 安装过程省略。 安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。 安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。   Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址 director">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SVN的使用及代码合并">
 <meta property="og:url" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/index.html">
 <meta property="og:site_name" content="毛线球上的喵星人">
-<meta property="og:description" content="客户端使用下载地址在此 安装过程省略。 安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。 安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。  Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址 directory">
+<meta property="og:description" content="客户端使用下载地址在此 安装过程省略。 安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。 安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。   Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址 director">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/assets/img/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress">
-<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/assets/img/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png?x-oss-process=style/mxcompress">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png">
 <meta property="article:published_time" content="2020-03-13T08:51:54.000Z">
 <meta property="article:modified_time" content="2021-01-08T09:02:27.557Z">
 <meta property="article:author" content="MaoxianCk">
 <meta property="article:tag" content="程序">
 <meta property="article:tag" content="代码">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/assets/img/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress">
+<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png">
   
   
   
@@ -282,7 +282,8 @@
 <p>安装过程省略。</p>
 <p>安装后，软件默认设置为英文，有需要可以右键任意位置，打开下拉菜单中svn里setting选项，将语言设置为中文，但是建议使用英文。</p>
 <p>安装后，在需要作为代码仓库的目录下建立一个文件夹，右键该文件夹，选择SVN Checkout 选项。</p>
-<p><img src="./assets/img/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/d48d1fa265fd71a1f8f9515e0125b963-112214-1610094767.png" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <p>Url中填写的是svn的仓库地址，可以在自己的服务器上搭建Svn仓库，一般填写由仓库管理员给定的仓库地址</p>
 <p>directory中是刚刚选择的文件夹</p>
 <p>之后点击ok在弹窗中填入账号密码（由svn服务器管理员提供），正确后默认会拉取仓库里最新的文件</p>
@@ -290,7 +291,8 @@
 <p>配置好后右键该文件夹，右键菜单上会多出两个选项，Svn Update 和Svn Commit ，一个更新，一个提交。</p>
 <p>Update没什么好说的，就是同步服务器上的最新代码到本地。注意在更新时，如果本地对应文件被修改过，一般不会更新。</p>
 <p>Commit，提交本地的文件到服务器上。</p>
-<p><img src="./assets/img/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png?x-oss-process=style/mxcompress" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/%E7%A8%8B%E5%BA%8F/svn%E7%9A%84%E4%BD%BF%E7%94%A8%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/76063b91901bf8a4bfe859dde2898c7b-3dae24-1610094773.png" srcset="/img/loading.gif" lazyload class="" title="img">
+
 <p>上方文本框内填写备注，备注本次提交的内容（一般都要求写）</p>
 <p>下方文本框内显示的是本次提交的版本与服务器上版本不同的文件，提交时注意比较提交文件是否正确、是否无意中<strong>覆盖了别人代码</strong>、提交代码前注意<strong>上锁</strong>（右键项目文件夹GetLock），提交后注意<strong>解锁 ReleaseLock</strong>。</p>
 <h2 id="代码合并"><a href="#代码合并" class="headerlink" title="代码合并"></a>代码合并</h2><p>代码合并通常使用BeyoundCompare软件进行代码合并，稳妥的做法是<strong>另开</strong>一个文件夹，对svn服务端上的项目文件夹<strong>加锁</strong>，<strong>分别复制</strong> svn服务端上的项目和本地项目，使用该软件合并代码，并在<strong>本地测试通过后</strong> commit合并后的项目文件，最后同样注意<strong>解锁</strong>。</p>
