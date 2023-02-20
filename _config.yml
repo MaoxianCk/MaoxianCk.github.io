@@ -100,9 +100,9 @@ ignore:
 theme: fluid
 
 # hexo-renderer-marked
-marked:
-  prependRoot: true
-  postAsset: true
+# marked:
+#   prependRoot: true
+#   postAsset: true
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
