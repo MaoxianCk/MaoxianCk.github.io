@@ -19,11 +19,11 @@
     <meta name="description" content="上一篇文章中，我们已经搭建好了springboot web项目的基本架构，但是web开发当然只有这些是不够的，而一个项目当然也需要一个比较好的结构划分，   main 主要的源代码区 java 具体的代码层 config 配置，springboot的一些配置类可以放在这里，例如swagger的配置类等 error 异常处理，自定义的异常处理类等 interceptor 拦截器 utils 工具类，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SpringBoot Web 项目开发 (二) 工程结构">
-<meta property="og:url" content="http://example.com/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:url" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="毛线球上的喵星人">
 <meta property="og:description" content="上一篇文章中，我们已经搭建好了springboot web项目的基本架构，但是web开发当然只有这些是不够的，而一个项目当然也需要一个比较好的结构划分，   main 主要的源代码区 java 具体的代码层 config 配置，springboot的一些配置类可以放在这里，例如swagger的配置类等 error 异常处理，自定义的异常处理类等 interceptor 拦截器 utils 工具类，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress">
+<meta property="og:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress">
 <meta property="article:published_time" content="2019-06-26T08:51:50.000Z">
 <meta property="article:modified_time" content="2021-01-08T08:54:14.462Z">
 <meta property="article:author" content="MaoxianCk">
@@ -31,7 +31,7 @@
 <meta property="article:tag" content="Web">
 <meta property="article:tag" content="Spring">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress">
+<meta name="twitter:image" content="https://maoxianck.github.io/%E7%A8%8B%E5%BA%8F/SpringBoot/springboot-web-%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91-%E4%BA%8C-%E5%B7%A5%E7%A8%8B%E7%BB%93%E6%9E%84/assets/img/image-9b8189d3e15f07574698cf9232d72c34-bb380d-1610093408.png?x-oss-process=style/mxcompress">
   
   
   
@@ -73,7 +73,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"maoxianck.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -363,7 +363,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>SpringBoot Web 项目开发 (二) 工程结构</div>
-      <div>http://example.com/程序/SpringBoot/springboot-web-项目开发-二-工程结构/</div>
+      <div>https://maoxianck.github.io/程序/SpringBoot/springboot-web-项目开发-二-工程结构/</div>
     </div>
     <div class="license-meta">
       
