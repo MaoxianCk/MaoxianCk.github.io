@@ -4,15 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "72f0a3ba94574380",
+        "id": "9816b8fb2b812841",
         "type": "tabs",
         "children": [
           {
-            "id": "17593d7c9ef5b48b",
+            "id": "a02004935f1abf59",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "source/_posts/pages/Java 规划引擎 - OptaPlanner 初窥门径.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -74,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 480.5
+    "width": 569.5
   },
   "right": {
     "id": "e32428514c74a6ea",
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "source/_posts/pages/Java 规划引擎 - OptaPlanner 初窥门径.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,6 +111,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "source/_posts/pages/Java 规划引擎 - OptaPlanner 初窥门径.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -127,7 +133,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "source/_posts/pages/Java 规划引擎 - OptaPlanner 初窥门径.md"
+              }
             }
           }
         ]
@@ -139,17 +147,20 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "canvas:新建白板": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
-      "canvas:Create new canvas": false,
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
       "file-tree-alternative:File Tree Alternative Plugin": false
     }
   },
-  "active": "17593d7c9ef5b48b",
+  "active": "a02004935f1abf59",
   "lastOpenFiles": [
+    "source/_posts/early/数据结构-链表.md",
+    "source/_posts/pages/Java 规划引擎 - OptaPlanner 初窥门径.md",
+    "source/_posts/early/记一次离奇的网络瘫痪.md",
     "source/_posts/pages/测试文章.md",
     "source/_posts/pages/pages.md",
     "测试文章.md",
